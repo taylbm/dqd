@@ -1,0 +1,200 @@
+{
+	"moments":[
+		    "R",
+		    "V",
+		    "W",
+		    "D"
+	],
+	"sails_seq":{
+		    "1":"1st SAILS",
+		    "2":"2nd SAILS",
+		    "3":"3rd SAILS"
+	},
+    "noSystemChangeTimeout":300,
+	"rdaCommandStickyToggleTimeout":900000,
+	"perfCheckYellow":1800000,
+ 	"zrCats":{
+		    "CONVECTIVE":300.0,
+		    "TROPICAL":250.0,
+		    "MARSHALL-PALMER":200.0,
+		    "EAST-COOL-STRATIFORM":130.0,
+		    "WEST-COOL-STRATIFORM":75.0
+	},
+	"refreshInterval":1000,
+	"clockInterval":1000,
+	"calendar":{
+		"tday": [
+			"Sunday",
+			"Monday",
+			"Tuesday",
+			"Wednesday",
+			"Thursday",
+			"Friday",
+			"Saturday"
+			],
+    	"tmonth":[
+			"January",
+			"February",
+			"March",
+			"April",		
+			"May",
+			"June",
+			"July",
+			"August",
+			"September",
+			"October",
+			"November",
+			"December"
+			],
+		"smonth":[
+			"Jan",
+			"Feb",
+			"Mar",
+			"Apr",
+			"May",
+			"Jun",
+			"Jul",
+			"Aug",
+			"Sept",
+			"Oct",
+			"Nov",	
+			"Dec"
+			]
+	},
+	"noSystemChangeMsg":" >> No System Status Change in the last 5 minutes",
+	"hardCommandConfirm":[
+					"You are about to enable ",
+					". Change will not take effect until the start of volume scan. Do you want to continue?"
+					],
+	"softCommandConfirm":[
+					"Are you sure you want to change ",
+					" to ",
+					" ?"
+					],
+	"controlRPG":
+				{
+				"SHUTDOWN":"You are about to stop all of the RPG processes.",
+				"SUB":
+				      [
+					  "You are about to restart all of the RPG processes.",
+					  " Do you want to continue?"
+					  ],
+				"MRPG_STARTUP":
+					  {
+						"MRPG_ST_STANDBY":" Contents of datastores will be preserved.",
+						"MRPG_ST_SHUTDOWN":" Contents of some datastores will be reinitialized.",
+						"MRPG_ST_OPERATING":" Contents of datastores will be preserved.",
+						"FAIL":"RPG Startup only valid in Standby, Shutdown, and Operate states."
+					  },
+				"MRPG_CLEANUP":
+					  {
+						"SUCESS":"Using this Clean Startup option will empty the contents of ALL datastores and then restart all of the RPG processes.",
+						"FAIL":"RPG Clean Startup only valid in Standby, Shutdown, and Operate states."
+					  }
+				},
+    "controlRDA":
+               {
+                "STATE":"You are about to change the RDA state. Do you want to continue?"
+               },
+
+	"popTitle":"Confirm Action",
+	"popTitleSAILS":"SAILS Control",
+	"defaults":
+               {	
+				"Pre":"Do you want to permanently change the",
+				"defModeA":" Default VCP for Mode A to",
+				"defModeB":" Default VCP for Mode B to ",
+				"defWx":" Default Weather Mode to "
+			    },
+	"SAILSDialog":"Selecting \"0\" cuts will disable SAILS. All non-zero numbers are additional scans of the lowest elevation beyond any already defined in the VCP",
+    "SAILSfeedback":[
+                    " >> SAILS Disabled",
+                    " >> SAILS set to ",
+                    " cut(s) "
+                    ],
+    "perfCheck":
+                {
+                 "Accept":"You have selected to force a Performance Check after completion of the current volume scan. The Performance Check will take approximately two minutes to complete. <br> Do you wish to continue?",
+                 "Reject":"A Performance Check can only be initated when the RDA is in Operate and the RPG has control of the RDA."
+                },
+    "CRDA_PERF_CHECK":"Initiating Performance Check after current volume",
+    "CRDA_STANDBY":"Change RDA to Standby state",
+    "CRDA_RESTART":"Change RDA to Restart state",
+    "CRDA_OPERATE":"Change RDA to Operate state",
+    "CRDA_OFFOPER":"Change RDA to Offline Operate state",
+    "CRDA_UTIL":"Request switch to Utility Power",
+    "CRDA_AUXGEN":"Request switch to Auxiliary Power",
+    "CRDA_ENLOCAL":"Enable RDA control of RDA",
+    "CRDA_REREMOTE":"Request RPG to control RDA selected",
+    "RDAStatus":"Requesting RDA Status data",
+    "RDApower":"You are about to change the RDA power source. Do you want to continue?",
+    "RDAalarms": [
+                    "NO_ALARMS", 
+                    "RDA_CONTROL", 
+                    "TOW_UTIL", 
+                    "PEDESTAL", 
+                    "RPG_COMMUN", 
+                    "SIGPROC",  
+                    "RECV", 
+                    "TRANSMITTER"
+                 ],
+    "RS_DATA_TRANS_ENABLED":
+                    {
+                     "0":"NONE",  
+                     "1":"R",
+                     "2":"V",
+                     "3":"R V",
+                     "4":"W",
+                     "5":"R W",
+                     "6":"V W",
+                     "7":"R V W"
+                    },
+    "RPGalarmSum":
+                    {
+                     "RPGPRDSTGLS":"#00FFFF",
+                     "RDAINLS":"#00FFFF",
+                     "RPGINLS":"#00FFFF",
+                     "DISTRI":"#FCFC23",
+                     "RDAWB":"#FCFC23",
+                     "DBFL":"#FCFC23",
+                     "RPGTSKFL":"#FCFC23",
+                     "RPGRPGFL":"#FCFC23",
+                     "REDCHNER":"#FCFC23",    
+                     "RPGCTLFL":"#FFA500",
+                     "NODE_CON":"#FFA500",
+                     "WBFAILRE":"#FFA500",
+                     "MEDIAFL":"#FFA500"
+                    },     
+    "colorMsgs":
+                {
+                     "MAR":"minor-alarm",
+                     "MAM":"major-alarm",
+                     "INOP":"inop",
+                     "LS":"loadshed",
+                     "NA":"",
+                     "SEC":"white",
+                     "WARN":"minor-alarm",
+                     "INFO":"gray",
+                     "COMMS":"seagreen",
+                     "GEN":""
+                },   
+	"canvasHeight":285,
+	"superResFont":"bold 50px Helvetica",
+	"sailsSeqFont":"bold 30px Helvetica",
+	"elFont":"bold 80px Helvetica",
+	"sailsAvsetFont":"bold 18px Helvetica",
+	"rdaItems":[
+				"RS_SUPER_RES",
+				"RS_CMD",
+				"RS_AVSET"
+				],
+	"towerLeftX":60,
+	"towerRightX":240,
+	"towerBottomY":290,
+	"towerTopY":344
+
+
+	
+										
+	
+} 

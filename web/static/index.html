@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Data Quality Dashboard</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="jquery.mobile-1.4.5/jquery.mobile-1.4.5.css" />
+        <script src="jquery-1.11.2/jquery-1.11.2.min.js"></script>
+        <script src="jquery.mobile-1.4.5/jquery.mobile-1.4.5.min.js"></script>
+        <script src="flot/jquery.flot.min.js"></script>
+        <script src="flot/jquery.flot.fillbetween.js"></script>
+        <script src="flot/jquery.flot.time.js"></script>
+	<script src="flot/jquery.flot.symbol.js"></script>
+        <script src="justgage-master/raphael-2.1.4.min.js"></script>
+        <script src="justgage-master/justgage.min.js"></script>
+        <script src="dqd.js"></script>
+        <script id="all-data"></script>
+        <script id="summary-data"></script>
+
+        <script>        
+            var MainGage = null, RainGage = null, SnowGage = null, BraggGage = null;
+        
+            $(document).ready(function () {
+                $('#summary-data').load('static/summary.js', function () {
+		    if ($('#summary-data').html() == "") {
+                        alert("No ZDR Stats Available, please run dqdwalk to acquire the data, then refresh the page") 
+                    }
+		    else {
+		        $('.sites').html(ICAO+' - Shade Chart - Past 6 Months') 		    
+                        $('#site').html(ICAO)
+		        makeGages();
+            	        determineOverview('MostRecent','chan1')        
+                        $.each(SummaryData, function (idx, obj) {
+                            SummaryData[idx].medianRain = obj.medianRain > -99.0 ? obj.medianRain : null; 
+                            SummaryData[idx].medianSnow = obj.medianSnow > -99.0 ? obj.medianSnow : null;
+                            SummaryData[idx].medianBragg = obj.medianBragg > -99.0 ? obj.medianBragg : null;
+                        });
+		        $.each(DailyData,function(idx,obj) {
+			    DailyData[idx].medianRain = obj.medianRain > -99.0 ? obj.medianRain : null;
+			    DailyData[idx].medianSnow = obj.medianSnow > -99.0 ? obj.medianSnow : null;
+			    DailyData[idx].medianBragg = obj.medianBragg > -99.0 ? obj.medianBragg : null;
+		        });
+  		    }
+                    if(redundant == "False") 
+                        $('#channel-form').html(' ');
+                });
+		$('#choice-4').prop('checked',true).click();
+		$('#choice-5').prop('checked',true).click();
+                $( ":mobile-pagecontainer" ).on( "pagecontainershow", function( event, ui ) {
+		    var pointClicked = false,
+			clicksYet = false,
+			previousPoint = null
+		    ;
+                    if (!SummaryData) 
+                        event.preventDefault();
+
+                    setSizes(event, ui);
+		    $('input[name=channel-toggle]').prop('checked',false).trigger('refresh');
+		    var page = ui.toPage.get(0).id.replace('page','')
+		    if(redundant == "False")	
+			$("#"+page+"redundant").html(' ');
+                    $("#"+page+"redundant #toggle").find("input[type='checkbox']").click(function () {
+			var dataSet = [];
+		        $("#"+page+"redundant #toggle").find("input[type='checkbox']").each(function () {
+                            if ($(this).is(":checked")) {
+                                var position = $(this).attr("id");
+                                dataSet.push(position);
+                            }
+		        });
+		        setSizes(event,ui,dataSet)
+                    });
+		    $("#"+page+"container").bind("plothover",function(event, pos, item) {
+		        if (item) {
+			    if (previousPoint != item.datapoint) {	
+				previousPoint = item.datapoint;
+			        $("#tooltip").remove();
+				var x = item.datapoint[0],
+				    y = item.datapoint[1]
+				;
+				var actual = storeValues[x]
+				if (Math.abs(y) < 0.50)
+				    var actual = y;
+				var d = new Date(x)
+				var month = d.getUTCMonth()+1;
+				var day = d.getUTCDate();
+				var year = d.getUTCFullYear();
+				showTooltip(item.pageX, item.pageY, 
+					actual +"dB on "+ month+"/"+day+"/"+year
+				);
+			    }
+			}
+			else {
+			    $("#tooltip").remove();
+			    clicksYet = false;
+			    previousPoint = null;
+			}
+			
+		    });
+
+                });
+
+               	$('input[name="time-select"]').on('click',function(){
+		    var channel = $('#channel-form :checked').val()
+		    var value = $(this).attr('value');
+		    determineOverview(value,channel);
+		});
+		$('input[name="channel-select"]').on('click',function(){
+		    var value = $('#time-form :checked').val()
+                    var channel  = $(this).attr('value');
+                    determineOverview(value,channel);
+                });
+
+		
+                $('ul li a').on('click', function () {
+		    var name = $(this).attr('name')
+                    if (name == 'rain')
+                        window.location.href = '#rain-page',
+			window.location.reload()
+		    ;
+                    else if (name == 'snow')
+                        window.location.href = '#snow-page',
+			window.location.reload()
+		    ;
+                    else if (name == 'bragg')
+                        window.location.href = '#bragg-page',
+			window.location.reload()
+		    ;
+		    else if (name == 'home')
+			window.location.href = '#home-page',
+			window.location.reload()
+		    ;
+                });
+	
+            });
+        </script>
+    </head>
+    <body>
+        <div id="home-page" data-role="page">
+            <div id="nav-panel" data-role="panel" data-position="right" data-display="overlay">
+		        <ul data-role="listview">
+		            <li data-role="list-divider">
+		                ZDR Bias
+		            </li>
+		            <li data-icon="home">
+		                <a name="home"href="#home-page">Home</a>
+		            </li>
+		            <li>
+		                <a name="rain" href="#rain-page">Rain method</a>
+		            </li>
+		            <li>
+		                <a name="snow" href="#snow-page">Snow method</a>
+		            </li>
+		            <li>
+		                <a name="bragg" href="#bragg-page">Bragg method</a>
+		            </li>
+		        </ul>
+		    </div>
+        
+            <div data-role="header">
+                <h2>Data Quality Dashboard</h2>
+                <a href="#nav-panel" class="ui-btn-right ui-btn ui-btn-inline ui-btn-icon-right ui-icon-bars ui-shadow">Menu</a>
+            </div>
+            <div role="main" class="ui-content">
+                <div class="ui-bar ui-bar-a ui-grid-a">
+                    <h3 class="ui-block-a">ZDR Data Quality</h3><h1 align="right" id="site" class="ui-block-b"></h1>
+                </div>
+		<div class="ui-grid-a">
+		    <form class="ui-block-a">
+			<h4 style="display:inline-block">Time Period: </h4>
+		        <fieldset style="display:inline-block" id="time-form" data-type="horizontal" data-role="controlgroup">
+     		            <input type="radio" name="time-select" id="choice-1" value="6Months"/>
+     		    	    <label for="choice-1">6 Months</label>
+
+     		    	    <input type="radio" name="time-select" id="choice-2" value="1Month"/>
+     		    	    <label for="choice-2">1 Month</label>
+
+     		    	    <input type="radio" name="time-select" id="choice-3" value="7Days"/>
+     		    	    <label for="choice-3">7 Days</label>
+
+     		    	    <input type="radio" name="time-select" id="choice-4" value="MostRecent" checked="true"/>
+     		    	    <label for="choice-4">Most Recent</label>
+		    </fieldset>
+		</form>
+		<form class="ui-block-b" id="channel-form">
+		    <h4 style="display:inline-block">RDA Channel: </h4>
+                    <fieldset style="display:inline-block"data-type="horizontal" data-role="controlgroup" data-inline="true">
+                        <input type="radio" name="channel-select" id="choice-5" value="chan1"/>
+                        <label for="choice-5">Channel 1</label>
+
+                        <input type="radio" name="channel-select" id="choice-6" value="chan2"/>
+                        <label for="choice-6">Channel 2</label>
+                    </fieldset>
+		</form>
+		</div>
+		<h3 align="center" id="noData"></h3>
+                <div class="ui-body ui-body-a">
+		    <div id="main-gauge" style="height:480px; width:640px; margin:auto;"></div>
+		    <div class="ui-grid-b">
+	                    <div id="rain-gauge" class="ui-block-a ui-input-btn ui-btn ui-shadow">
+	                        <input name="rain" type="button" data-enhanced="true" value="">
+	                    </div>
+	                    <div id="snow-gauge" class="ui-block-b ui-input-btn ui-btn ui-shadow">
+	                        <input name="snow" type="button" data-enhanced="true" value="">
+	                    </div>
+	                    <div id="bragg-gauge" class="ui-block-c ui-input-btn ui-btn ui-shadow">
+	                        <input name="bragg" type="button" data-enhanced="true" value="">
+	                    </div>
+                    </div>
+                </div>
+            </div>
+            <div data-role="footer">
+                <h3>NEXRAD Radar Operations Center</h3>
+            </div>
+        </div>
+        
+        <div id="rain-page" data-role="page">
+            <div id="rain-nav-panel" data-role="panel" data-position="right" data-display="overlay">
+                <ul data-role="listview">
+                    <li data-role="list-divider">
+                        ZDR Bias
+                    </li>
+                    <li data-icon="home">
+                        <a name="home" href="#home-page">Home</a>
+                    </li>
+                    <li>
+                        <a name="rain" href="#rain-page">Rain method</a>
+                    </li>
+                    <li>
+                        <a name="snow" href="#snow-page">Snow method</a>
+                    </li>
+                    <li>
+                        <a name="bragg" href="#bragg-page">Bragg method</a>
+                    </li>
+                </ul>
+            </div>
+        
+            <div data-role="header">
+                <h2>ZDR Bias - Rain</h2>
+                <a href="#rain-nav-panel" class="ui-btn-right ui-btn ui-btn-inline ui-btn-icon-right ui-icon-bars ui-shadow">Menu</a>
+            </div>
+            <div id="rain-main" role="main" class="ui-content">
+                <h2 class="sites" align="center"></h2><h4 align="center">7 Day Running Median Shading/Daily Median Points</h4>
+		<form id="rain-redundant">	
+            	    <fieldset data-role="controlgroup" data-mini="true" id="toggle">
+                        <legend>RDA Channel:</legend>
+                	<input name="channel-toggle" id="chan1" type="checkbox">
+                	<label for="chan1">One</label>
+                	<input name="channel-toggle" id="chan2" type="checkbox">
+                	<label for="chan2">Two</label>
+                    </fieldset>
+		</form>
+		<div id="rain-container"></div>
+            </div>
+            <div data-role="footer">
+                <h3>NEXRAD Radar Operations Center</h3>
+            </div>
+        </div>
+        
+        <div id="snow-page" data-role="page">
+            <div id="snow-nav-panel" data-role="panel" data-position="right" data-display="overlay">
+                <ul data-role="listview">
+                    <li data-role="list-divider">
+                        ZDR Bias
+                    </li>
+                    <li data-icon="home">
+                        <a name="home" href="#home-page">Home</a>
+                    </li>
+                    <li>
+                        <a name="rain" href="#rain-page">Rain method</a>
+                    </li>
+                    <li>
+                        <a name="snow" href="#snow-page">Snow method</a>
+                    </li>
+                    <li>
+                        <a name="bragg" href="#bragg-page">Bragg method</a>
+                    </li>
+                </ul>
+            </div>
+        
+            <div data-role="header">
+                <h2>ZDR Bias - Snow</h2>
+                <a href="#snow-nav-panel" class="ui-btn-right ui-btn ui-btn-inline ui-btn-icon-right ui-icon-bars ui-shadow">Menu</a>
+            </div>
+            <div id="snow-main" role="main" class="ui-content">
+		<h2 class="sites" align="center"></h2><h4 align="center">7 Day Running Median Shading/Daily Median Points</h4>
+                <form id="snow-redundant">
+                    <fieldset data-role="controlgroup" data-mini="true" id="toggle">
+                        <legend>RDA Channel:</legend>
+                        <input name="channel-toggle" id="chan1" type="checkbox">
+                        <label for="chan1">One</label>
+                        <input name="channel-toggle" id="chan2" type="checkbox">
+                        <label for="chan2">Two</label>
+                    </fieldset>
+		</form>
+		<div id="snow-container"></div>
+            </div>
+            <div data-role="footer">
+                <h3>NEXRAD Radar Operations Center</h3>
+            </div>
+        </div>
+        
+        <div id="bragg-page" data-role="page">
+            <div id="bragg-nav-panel" data-role="panel" data-position="right" data-display="overlay">
+                <ul data-role="listview">
+                    <li data-role="list-divider">
+                        ZDR Bias
+                    </li>
+                    <li data-icon="home">
+                        <a name="home" href="#home-page">Home</a>
+                    </li>
+                    <li>
+                        <a name="rain" href="#rain-page">Rain method</a>
+                    </li>
+                    <li>
+                        <a name="snow" href="#snow-page">Snow method</a>
+                    </li>
+                    <li>
+                        <a name="bragg" href="#bragg-page">Bragg method</a>
+                    </li>
+                </ul>
+            </div>
+        
+            <div data-role="header">
+                <h2>ZDR Bias - Bragg</h2> 
+                <a href="#bragg-nav-panel" class="ui-btn-right ui-btn ui-btn-inline ui-btn-icon-right ui-icon-bars ui-shadow">Menu</a>
+            </div>
+            <div id="bragg-main" role="main" class="ui-content">
+                <h2 class="sites" align="center"></h2><h4 align="center">7 Day Running Median Shading/Daily Median Points</h4>
+		<form id="bragg-redundant">
+                    <fieldset data-role="controlgroup" data-mini="true" id="toggle">
+                        <legend>RDA Channel:</legend>
+                        <input name="channel-toggle" id="chan1" type="checkbox">
+                        <label for="chan1">One</label>
+                        <input name="channel-toggle" id="chan2" type="checkbox">
+                        <label for="chan2">Two</label>
+                    </fieldset>
+		</form>
+	 	<div id="bragg-container"></div>
+            </div>
+            <div data-role="footer">
+                <h3>NEXRAD Radar Operations Center</h3>
+            </div>
+        </div>
+    </body>
+</html>
