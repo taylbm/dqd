@@ -188,15 +188,13 @@ def parse_zdr_stats(zdr_split):
             return None
 
 
-def dqdwalk():
+def dqdwalk(rand_dirname):
     zdr_stats_raw = []
     zdr_stats_split = []
-
-    dump = Popen(['standalone_dsp -a -g "ZDR Stats" -t'],shell = True, stdout = PIPE, stderr = PIPE)
-
+    dump = Popen(['standalone_dsp -w -D ' + rand_dirname + ' -g "ZDR Stats" -t'],shell = True, stdout = PIPE, stderr = PIPE)
     print('--> retrieving output')
     out = dump.communicate()
-    
+    shutil.rmtree(rand_dirname)
     print('--> parsing ASP data')
     zdr_stats_raw = out[0].split('\n')
     raw_split = [parse_zdr_stats(zdr_stat.split('>>')) for zdr_stat in zdr_stats_raw]
@@ -326,9 +324,7 @@ class DQDwalk(object):
 	        subdir_list = os.listdir(ASP_dir + date_split[2] +  d)
 		for s in subdir_list:
 		    os.symlink(ASP_dir + date_split[2] + d + s, rand_dirname + s)
-	    call(['standalone_dsp','-w','-D',rand_dirname,'-P'])
-	    shutil.rmtree(rand_dirname)
-	    ret = dqdwalk()
+	    ret = dqdwalk(rand_dirname)
 	else:	
 	    ret = 'Invalid ICAO'
 	return gzip_response(json.dumps(ret))
