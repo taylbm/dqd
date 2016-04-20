@@ -24,11 +24,11 @@ URLS = (
 )
 
 class MyApplication(web.application):
-    def run(self, port=8080, *middleware):
+    def run(self, port=5555, *middleware):
         func = self.wsgifunc(*middleware)
         return web.httpserver.runsimple(func, ('0.0.0.0', port))
 
 if __name__ == '__main__':
     app = MyApplication(URLS, globals())
-    app.run(port=5555)
+    application = app.wsgifunc()
 
