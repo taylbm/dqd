@@ -20,9 +20,10 @@ SESSION_DIR = '/tmp/DQD'
 URLS = (
     '/','handlers.IndexView',           # you can list other handlers here
     '/button','handlers.Button',
-    '/dqdwalk','handlers.DQDwalk'
+    '/dqdwalk','handlers.DQDwalk',
+    '/aspwalk','handlers.ASPwalk'
 )
 
 if __name__ == '__main__':
     application = web.application(URLS, globals()).wsgifunc()
-
+    #application.run()

@@ -1,0 +1,79 @@
+.RPG_LS_ALARM {
+    background-color: #0FF
+}
+
+.RPG_MAR_ALARM {
+    background-color: #FCFC23
+}
+
+.RPG_MAM_ALARM {
+    background-color: orange
+}
+
+.RPG_ALARM_CLEARED {
+    background-color: #51FF22
+}
+
+.RPG_WARNINGS {
+    background-color: #FCFC23
+}
+
+.RPG_GEN_STATUS {
+    background-color: #33ccff
+}
+
+.RPG_INFO {
+    background-color: #d3d3d3
+}
+
+.NB_COMMS {
+    background-color: #2e8b57
+}
+
+.RDA_SECONDARY_ALARM {
+    background-color: silver
+}
+
+.RDA_MAR_ALARM {
+    background-color: #FCFC23
+}
+
+.RDA_MAM_ALARM {
+    background-color: orange
+}
+.WARN::after {
+    background-color:#e6e600 !important;
+}
+.GEN::after {
+    background-color:#78C1D4 !important;
+}
+.INFO::after {
+    background-color:gray !important; 
+}
+.LS::after {
+    background-color:#00FFFF !important;
+}
+.MAR::after {
+    background-color:#e6e600 !important;
+}
+.MAM::after { 
+    background-color:#FFA500 !important;
+}
+.COMMS::after {
+    background-color:#2e8b57 !important;
+}
+.INOP::after {
+    background-color:red !important;
+}
+.SEC::after {
+    background-color:silver !important;
+}
+#logTable {
+  border:medium double grey; 
+  background-color:#33ccff;
+  border-collapse:separate;
+  display: block;
+  height: 600px;
+  overflow-y: scroll;
+}
+

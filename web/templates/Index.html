@@ -12,7 +12,9 @@
 ###
 ### inheritence chain
 ###
+
 <%inherit file="layout.mako" />
+<%include file="asp_viewer.html"/>
 
 ###
 ### namespaces
@@ -24,30 +26,18 @@
 ###
 
 <%block name="extra_header_markup">
-<script src="static/dqd.js"></script>
 </%block>
 <% page_list = ['rain','snow','bragg']
 %>
 
-        <div id="home-page" data-role="page">
-	    <div data-role="popup" data-position-to="origin" style="max-height:600px;overflow-y:scroll" id="selectICAO" data-theme="b">
-	        <form class="ui-filterable">
-	   	    <input id="filterICAO" data-type="search">
-		</form>
-		<ul data-role="listview" data-filter="true" data-input="#filterICAO">
-		% for site in context.get("ICAO_list"):
-		    <li><a class="ICAO" id="${site}" href="#">${site}</a></li>
-		% endfor
-		</ul>
-	    </div>
-
+        <div id="dqd-page" data-role="page">
             <div id="nav-panel" data-role="panel" data-position="right" data-display="overlay">
 		        <ul data-role="listview">
 		            <li data-role="list-divider">
 		                ZDR Bias
 		            </li>
 		            <li data-icon="home">
-		                <a name="home"href="#home-page">Home</a>
+		                <a name="home"href="#dqd-page">Home</a>
 		            </li>
 		            <li>
 		                <a class="chart-page" name="rain" href="#rain-page">Rain method</a>
@@ -59,12 +49,29 @@
 		                <a class="chart-page" name="bragg" href="#bragg-page">Bragg method</a>
 		            </li>
 		        </ul>
-		    </div>
-        
-            <div data-role="header">
-                <h2>Data Quality Dashboard</h2>
-                <a href="#nav-panel" class="ui-btn-right ui-btn ui-btn-inline ui-btn-icon-right ui-icon-bars ui-shadow">Menu</a>
-            </div>
+	    </div>
+            <div data-role="header" style="overflow:hidden;" data-theme="b">
+                <div class="ui-grid-c">
+        	    <div class="ui-block-a" style="width:10%">
+            	 	<img style="height:100px" src="static/ROC_logo.png"></img>
+        	    </div>
+                    <div class="ui-block-b" style="width:10%">
+                 	<img style="height:100px" src="static/NWS_logo.svg"></img>
+            	    </div>
+            	    <div class="ui-block-c" style="width:10%">
+            		<img style="height:100px" src="static/NOAA_logo.svg"></img>
+        	    </div>
+        	    <h1 class="ui-block-d" style="text-align:center;width:70%;margin-top:2%;margin-bottom:2%">Data Quality Dashboard</h1>
+        	</div>
+                <a href="#nav-panel" class="ui-btn-right ui-btn-a ui-btn ui-btn-inline ui-btn-icon-right ui-icon-bars ui-shadow">Menu</a>
+                <div data-role="navbar" data-iconpos="right">
+                    <ul>
+                        <li><a href="http://swewww/asp_view" rel="external" target="_blank" data-icon="action">ASP Viewer</a></li>
+            	        <li><a href="#asp-view" data-icon="bullets">ASP Viewer Beta</a></li>
+        	    </ul>
+   	        </div><!-- /navbar -->
+       	    </div><!-- /header --> 
+
             <div role="main" class="ui-content">
                 <div class="ui-bar ui-bar-a ui-grid-d">
                     <h3 class="ui-block-a" style="width:15%">ZDR Data Quality</h3>
@@ -75,14 +82,14 @@
                 </div>
 		<div class="ui-grid-b">
 		    <div class="ui-block-a" style="width:38%">
-                        <a href="#selectICAO" data-rel="popup" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-gear ui-btn-icon-left ui-btn-a">Select Site</a>
-                        <div data-role="popup" data-overlay-theme="b" data-position-to="origin" style="max-height:600px;overflow-y:scroll" id="selectICAO" data-theme="b">
+                        <a href="#selectDQDICAO" data-rel="popup" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-gear ui-btn-icon-left ui-btn-a">Select Site</a>
+                        <div data-role="popup" data-overlay-theme="b" data-position-to="origin" style="max-height:600px;overflow-y:scroll" id="selectDQDICAO" data-theme="b">
                             <form class="ui-filterable">
-                                <input id="filterICAO" data-type="search">
+                                <input id="filterDQDICAO" data-type="search">
                             </form>
-                            <ul data-role="listview" data-filter="true" data-input="#filterICAO">
+                            <ul data-role="listview" data-filter="true" data-input="#filterDQDICAO">
                             % for site in context.get("ICAO_list"):
-                                <li><a class="ICAO" id="${site}" href="#">${site}</a></li>
+                                <li><a class="DQDICAO" id="${site}" href="#">${site}</a></li>
                             % endfor
                             </ul>
                         </div>
@@ -98,7 +105,7 @@
 			    <option id="${num + 1}">${month}</option>
 			% endfor
                         </select>
-                        <a href="#" id="submitDate" class="ui-shadow ui-btn ui-corner-all ui-btn-inline ui-btn-icon-left ui-icon-check">Submit</a>
+  			<a href="#" id="submitDQDDate" class="ui-shadow ui-btn ui-corner-all ui-btn-inline ui-btn-icon-left ui-icon-check">Submit</a>
 		    </div>
 		    <form class="ui-block-b" style="width:32%">
 		        <fieldset style="display:inline-block" id="time-form" data-type="horizontal" data-role="controlgroup">
@@ -142,7 +149,7 @@
                 </div>
             </div>
             <div data-role="footer">
-                <h3>NEXRAD Radar Operations Center - ROC INTERNAL</h3>
+                <h3>NEXRAD Radar Operations Center - INTERNAL USE ONLY</h3>
             </div>
         </div>
         % for name in page_list:
@@ -153,7 +160,7 @@
                         ZDR Bias
                     </li>
                     <li data-icon="home">
-                        <a name="home" href="#home-page">Home</a>
+                        <a name="home" href="#dqd-page">Home</a>
                     </li>
                     <li>
                         <a class="chart-page" name="rain" href="#rain-page">Rain method</a>
@@ -185,7 +192,7 @@
 		<div id="${name}-container"></div>
             </div>
             <div data-role="footer">
-                <h3>NEXRAD Radar Operations Center - ROC INTERNAL</h3>
+                <h3>NEXRAD Radar Operations Center - INTERNAL USE ONLY</h3>
             </div>
         </div>
         % endfor 

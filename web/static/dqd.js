@@ -26,7 +26,7 @@ var storeValues = {};
 var storeData = {};
 var year = now.getFullYear().toString();
 var monthNum = (now.getMonth() + 1).toString();
-var ICAO = 'KTLX';
+var DQDICAO = 'KTLX';
 var firstLoad = true;
 var MainGage = null, RainGage = null, SnowGage = null, BraggGage = null;
 function recalcInterval(year,monthNum)
@@ -409,10 +409,11 @@ function makeGages()
 
 }
 
-function loadData(recalc){
-    var load_string = 'dqdwalk?d=' + monthNum + '-' + year + '-' + ICAO
-    $('.sites').html(ICAO+' - Shade Chart - Past 6 Months');
-    $('#site').html(ICAO);
+function loadDQDData(recalc) 
+{
+    var load_string = 'dqdwalk?d=' + monthNum + '-' + year + '-' + DQDICAO
+    $('.sites').html(DQDICAO+' - Shade Chart - Past 6 Months');
+    $('#site').html(DQDICAO);
     $('#selectMonth').val(numberToMonth[monthNum]).selectmenu('refresh')
     $('#selectYear').val(year).selectmenu('refresh')
     $('.ui-loader').css('display','initial')
@@ -451,7 +452,8 @@ function loadData(recalc){
 
 
 
-$(document).ready(function () {	
+$(document).ready(function () {
+	$('#dqd-page-link').click()	
        	$( ".chart-page" ).on( "click", function() {
 	    var pointClicked = false,
 		clicksYet = false,
@@ -500,16 +502,17 @@ $(document).ready(function () {
 	    }
 	});
 
-	$('#submitDate').on('click', function() {
+	$('#submitDQDDate').on('click', function() {
+	    console.log('fu')
 	    year = $('#selectYear').val();
 	    monthNum = $('#selectMonth :selected').attr('id');
-	    loadData(true);
+	    loadDQDData(true);
 	});
 
-	$('.ICAO').on('click', function () {
-	    ICAO = $(this).attr("id");
-	    $('#selectICAO').popup('close');
-	    loadData(false);
+	$('.DQDICAO').on('click', function () {
+	    DQDICAO = $(this).attr("id");
+	    $('#selectDQDICAO').popup('close');
+	    loadDQDData(false);
 	});
 	$('#choice-4').prop('checked',true).click();
 	$('#choice-5').prop('checked',true).click();
@@ -526,7 +529,7 @@ $(document).ready(function () {
 	    var recalc = monthNum != (nowTemp.getMonth() + 1).toString() 
 	    determineOverview(channel, recalc,false);
 	});
-	$('#selectICAO').popup('open')
+	//$('#selectDQDICAO').popup('open')
 			
 	
 });
