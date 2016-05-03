@@ -4,8 +4,8 @@ import sys
 HERE = os.path.split(os.path.abspath(__file__))[0]     # looks awful, but gets the parent dir
 PARENT = os.path.split(HERE)[0]
 sys.path.append(PARENT+"/deps")
+sys.path.append(PARENT+"/webapps")
 MODULE_CACHE_DIR = '/tmp/DQD/mako_modules'      
-
 import web
 
 from templating import Configure
@@ -24,6 +24,5 @@ URLS = (
     '/aspwalk','handlers.ASPwalk'
 )
 
-if __name__ == '__main__':
-    application = web.application(URLS, globals()).wsgifunc()
-    #application.run()
+application = web.application(URLS, globals()).wsgifunc()
+#application.run()

@@ -1,4 +1,4 @@
-var loadPre = "aspwalk?d=";
+var loadPre = "dqd/aspwalk?d=";
 var ICAO = 'KTLX';
 var messageStore = {};
 var filename = "out.txt";

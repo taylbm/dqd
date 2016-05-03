@@ -411,7 +411,7 @@ function makeGages()
 
 function loadDQDData(recalc) 
 {
-    var load_string = 'dqdwalk?d=' + monthNum + '-' + year + '-' + DQDICAO
+    var load_string = 'dqd/dqdwalk?d=' + monthNum + '-' + year + '-' + DQDICAO
     $('.sites').html(DQDICAO+' - Shade Chart - Past 6 Months');
     $('#site').html(DQDICAO);
     $('#selectMonth').val(numberToMonth[monthNum]).selectmenu('refresh')

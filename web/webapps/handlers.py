@@ -19,6 +19,8 @@ import re
 
 HERE = os.path.split(os.path.abspath(__file__))[0]
 PARENT = os.path.split(HERE)[0]
+os.environ["PATH"] += os.pathsep + os.path.join(os.path.split(PARENT)[0],"bin") # sets path for apache
+
 config_file = os.path.join(PARENT,'dqd.conf') 
 
 f = open(config_file, 'r')
@@ -27,7 +29,6 @@ try:
     config = json.load(f)
 finally:
     f.close()
-
 ASP_dir = config["ASP_dir"]
 ICAO_list_full = os.listdir(ASP_dir)
 ICAO_list = [ i for i in ICAO_list_full if i[0] in config["ICAO_allowable"] ]
@@ -53,7 +54,6 @@ def stripNaN(val):
     return val
 
 def getFileNames(date):
-    print HERE
     date_split = date.d.split('_')
     ICAO = date_split[0]
     start_date = date_split[1]
@@ -189,7 +189,7 @@ def dqdwalk(rand_dirname):
     summary = []
     daily = []
     redundant = []
-    while i < len(zdr_processed):
+    while i < len(zdr_processed):	
         el = zdr_processed[i]
         now = times[i]
         day_7 = now + datetime.timedelta(days=7)
@@ -238,7 +238,6 @@ def dqdwalk(rand_dirname):
         })
 	redundant.append(mode_redundant)
         i += idx_today
-
     redundantBool = 1 in redundant and 2 in redundant
     out_dict = {
 		'redundantBool': redundantBool,
@@ -247,6 +246,7 @@ def dqdwalk(rand_dirname):
      		'redundant':redundant,
      		'statsFound': stats_found
     }
+    
     return out_dict
 
 class IndexView(object):
@@ -310,10 +310,8 @@ class DQDwalk(object):
                 subdir_list = os.listdir(ASP_dir + date_split[2] + d)
                 for s in subdir_list:
                     os.symlink(ASP_dir + date_split[2] + d + s, rand_dirname + s)
-
-
             ret = dqdwalk(rand_dirname)
         else:
             ret = 'Invalid ICAO'
-        return gzip_response(json.dumps(ret))
+        return json.dumps(ret)
 
