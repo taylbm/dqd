@@ -29,6 +29,7 @@ try:
     config = json.load(f)
 finally:
     f.close()
+
 ASP_dir = config["ASP_dir"]
 ICAO_list_full = os.listdir(ASP_dir)
 ICAO_list = [ i for i in ICAO_list_full if i[0] in config["ICAO_allowable"] ]
@@ -41,7 +42,7 @@ def hasNumbers(inputString):
     return any((char.isdigit() for char in inputString))
 
 def getPaths(month, year):
-    return [ '/' + str(year + (-1 if month - x <= 0 else 0)) + '/' + '%02d' % ((month - x + 11) % 12 + 1) + '/' for x in xrange(6) ]
+    return [ '/' + str(year + (-1 if month - x <= 0 else 0)) + '/' + '%02d' % ((month - x + 11) % 12 + 1) + '/' for x in xrange(7) ]
 
 def getYears():
     years = os.listdir(ASP_dir + 'KABR')

@@ -1,25 +1,20 @@
 var loadPre = "dqd/aspwalk?d=";
 var ICAO = 'KTLX';
 var messageStore = {};
-var filename = "out.txt";
 var mimeType = "text/plain";
+var logInfo = "N/A"
 
 function loadData(loadString) 
 {
+    logInfo = loadString;
     $('.ui-loader').css('display','initial')
     $.getJSON(loadPre + loadString, function (data) {
 	$('#logBody').html('<tr/>')
 	messageStore = data;
-	var dLog = loadString + '\n';
         for (var m = 0 ; m < data.length - 1; m++) {
 	    var classString = data[m][0]
 	    $('#logTable').find('tbody').append($('<tr>').text(data[m][1]).attr('class',classString))
-	    dLog += data[m][0] + ',' + data[m][1] + '\n';
         }
-        $('#downloadLog').attr({
-            'download':filename,
-            'href':'data:' + mimeType + ';charset=utf-8,' + encodeURIComponent(dLog)
-        });
         $('.ui-loader').css('display','none')
     })
     .error(function (jqXHR, textStatus, errorThrown) {
@@ -31,9 +26,22 @@ function loadData(loadString)
 	$('#printPage').click(function() { 
 	    alert('this feature is under construction :(')
 	})
-	$('#logBody').click(function() { 
-	    downloadInnerHtml("out.txt","main","text/html")
-	});
+        $('#downloadLog').on('click',function() {
+            var log = logInfo +"\n Filter String: " + $('#filterTable-input').attr('data-lastval') + '\n'
+            $('#logBody').find('tr').each(function (idx,obj) {
+                if (obj.firstChild != null && obj.className.indexOf('ui-screen-hidden') < 0)
+                    log += obj.className + ',' + obj.firstChild.data + '\n'
+            });
+            var link = document.createElement('a');
+            link.setAttribute('download', logInfo + ".txt")
+            link.setAttribute('href','data:' + mimeType + ';charset=utf-8,' + encodeURIComponent(log))
+            document.body.appendChild(link)
+            link.click()
+            setTimeout(function(){
+                document.body.removeChild(link);//remove element
+            }, 1);
+        });
+
 	$('#datep').datepicker({
 	    minDate: new Date(2008, 12, 1),
 	    maxDate: new Date()

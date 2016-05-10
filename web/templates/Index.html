@@ -75,7 +75,7 @@
             <div role="main" class="ui-content">
                 <div class="ui-bar ui-bar-a ui-grid-d">
                     <h3 class="ui-block-a" style="width:15%">ZDR Data Quality</h3>
-		    <h3 class="ui-block-b" style="width:25%">6 Month Period Ending:</h3>
+		    <h3 id="endStamp" class="ui-block-b" style="width:25%">6 Month Period Ending:</h3>
 		    <h3 class="ui-block-c" style="width:30%">Time Period:</h3>
 		    <h3 class="ui-block-d redundant" style="visibility:hidden" align="center">RDA Channel:</h3>
 		    <h1 class="ui-block-e" style="width:10%"align="right" id="site">ICAO</h1>
@@ -107,7 +107,7 @@
                         </select>
   			<a href="#" id="submitDQDDate" class="ui-shadow ui-btn ui-corner-all ui-btn-inline ui-btn-icon-left ui-icon-check">Submit</a>
 		    </div>
-		    <form class="ui-block-b" style="width:32%">
+		    <form class="ui-block-b" style="width:34%">
 		        <fieldset style="display:inline-block" id="time-form" data-type="horizontal" data-role="controlgroup">
      		            <input type="radio" name="time-select" id="choice-1" value="6Months"/>
      		    	    <label for="choice-1">6 Months</label>
@@ -119,10 +119,10 @@
      		    	    <label for="choice-3">7 Days</label>
 
      		    	    <input type="radio" name="time-select" id="choice-4" value="MostRecent" checked="true"/>
-     		    	    <label for="choice-4">Most Recent</label>
+     		    	    <label for="choice-4">Latest Volume</label>
 		        </fieldset>
 		    </form>
-		    <form class="ui-block-c redundant" id="channel-form" style="visibility:hidden;width:30%">
+		    <form class="ui-block-c redundant" id="channel-form" style="visibility:hidden;width:28%">
                         <fieldset style="display:inline-block"data-type="horizontal" data-role="controlgroup" data-inline="true">
                             <input type="radio" name="channel-select" id="choice-5" value="chan1"/>
                             <label for="choice-5">Channel 1</label>

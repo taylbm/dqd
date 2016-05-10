@@ -21,14 +21,47 @@ var numberToMonth = {
 	'11' : 'Nov',
 	'12' : 'Dec'
 }
-var weights = [0.25,0.33,0.42] // Weights for Rain, Snow, & Bragg methods, respectively
-var storeValues = {};
-var storeData = {};
-var year = now.getFullYear().toString();
-var monthNum = (now.getMonth() + 1).toString();
-var DQDICAO = 'KTLX';
-var firstLoad = true;
-var MainGage = null, RainGage = null, SnowGage = null, BraggGage = null;
+var weights = [0.25,0.33,0.42], // Weights for Rain, Snow, & Bragg methods, respectively
+    storeValues = {},
+    storeData = {},
+    year = now.getFullYear().toString(),
+    monthNum = (now.getMonth() + 1).toString(),
+    DQDICAO = 'KTLX',
+    firstLoad = true,
+    MainGage = null, RainGage = null, SnowGage = null, BraggGage = null
+;
+
+function dateCheck()
+{
+    var now = new Date();
+    var monthBool = monthNum == (now.getMonth() + 1).toString();
+    var yearBool = year == now.getFullYear().toString();
+    return monthBool && yearBool
+}
+
+function Interval()
+{
+    check = dateCheck()
+    if ( check ) {
+        now.setTime(Date.now());
+    }
+    else {
+        now.setUTCFullYear(year,monthNum,0);
+        now.setUTCHours(23,59,59,999);
+    }
+    var sevenDays = new Date(now.getTime() - 7 * 24 * 3600 * 1e3);
+    var month = new Date(now.getTime());
+    month.setUTCMonth(now.getUTCMonth(), 0)
+    then.setTime(now.getTime() - 182.5 * 24 * 3600 * 1e3);
+    var interval = {
+                        '7Days':sevenDays/1000,
+                        '1Month':month.getTime()/1000,
+                        '6Months':then/1000
+    };
+    return interval
+}
+
+
 function recalcInterval(year,monthNum)
 {
     now.setUTCFullYear(year,monthNum,0);
@@ -264,7 +297,7 @@ function normalizeToGage(val)
     return Math.max(0, Math.min(100, Math.round(val / 1.0 * 50 + 50)));
 }
 
-function determineOverview(chan,recalc,initialData)
+function determineOverview(chan,initialData)
 {
     var DailyData = initialData ? initialData['DailyData'] : storeData['DailyData'],
         redundantBool = initialData ? initialData['redundantBool'] : storeData['redundantBool']
@@ -278,7 +311,7 @@ function determineOverview(chan,recalc,initialData)
 	mRain = []
     ;
     var time = $('#time-form :checked').val()
-    var timeIntervalLocal = recalc ? recalcInterval(year,monthNum) : timeInterval
+    var timeInterval = Interval()
     if(redundantBool){
 	rBragg = {'chan1':[],'chan2':[]};
         rSnow = {'chan1':[],'chan2':[]};
@@ -286,7 +319,7 @@ function determineOverview(chan,recalc,initialData)
 	
 	if(time != 'MostRecent'){
             $.each(DailyData, function(idx,obj){
-                if(timeIntervalLocal[time] <= obj.time){
+                if(timeInterval[time] <= obj.time){
 		    var channel = 'chan' + redundant[idx]
                     rBragg[channel].push(obj.medianBragg);
                     rSnow[channel].push(obj.medianSnow);
@@ -313,7 +346,7 @@ function determineOverview(chan,recalc,initialData)
     else {
         if(time != 'MostRecent'){
             $.each(DailyData, function(idx,obj){
-                if(timeIntervalLocal[time] <= obj.time){
+                if(timeInterval[time] <= obj.time){
                     mBragg.push(obj.medianBragg);
                     mSnow.push(obj.medianSnow);
                     mRain.push(obj.medianRain);
@@ -409,7 +442,7 @@ function makeGages()
 
 }
 
-function loadDQDData(recalc) 
+function loadDQDData() 
 {
     var load_string = 'dqd/dqdwalk?d=' + monthNum + '-' + year + '-' + DQDICAO
     $('.sites').html(DQDICAO+' - Shade Chart - Past 6 Months');
@@ -436,8 +469,9 @@ function loadDQDData(recalc)
 		data['DailyData'][idx].medianSnow = obj.medianSnow > -99.0 ? obj.medianSnow : null;
 		data['DailyData'][idx].medianBragg = obj.medianBragg > -99.0 ? obj.medianBragg : null;
 	    });
-            determineOverview('chan1',recalc,data)
+            determineOverview('chan1',data)
 	    $('#statsFound').html('Total ZDR Stats Processed: ' + data['statsFound'].toString())
+	    $('#endStamp').html('6 Month Period Ending: ' + now.getUTCDate() + ' ' + numberToMonth[(now.getUTCMonth() + 1).toString()] + ' ' + now.getUTCFullYear())
 	}
 	var disp_redund = data['redundantBool'] ? 'initial' : 'hidden'
 	$('.redundant').css('visibility',disp_redund);
@@ -489,7 +523,7 @@ $(document).ready(function () {
 			    var day = d.getUTCDate();
 			    var year = d.getUTCFullYear();
 			    showTooltip(item.pageX, item.pageY, 
-				actual +"dB on "+ month+"/"+day+"/"+year
+				actual.toFixed(2) +"dB on "+ month+"/"+day+"/"+year
 			    );
 			}
 		    }
@@ -503,31 +537,26 @@ $(document).ready(function () {
 	});
 
 	$('#submitDQDDate').on('click', function() {
-	    console.log('fu')
 	    year = $('#selectYear').val();
 	    monthNum = $('#selectMonth :selected').attr('id');
-	    loadDQDData(true);
+	    loadDQDData();
 	});
 
 	$('.DQDICAO').on('click', function () {
 	    DQDICAO = $(this).attr("id");
 	    $('#selectDQDICAO').popup('close');
-	    loadDQDData(false);
+	    loadDQDData();
 	});
 	$('#choice-4').prop('checked',true).click();
 	$('#choice-5').prop('checked',true).click();
 	
 	$('input[name="time-select"]').on('click',function(){
 	    var channel = $('#channel-form :checked').val()
-	    var nowTemp = new Date();
-	    var recalc = monthNum != (nowTemp.getMonth() + 1).toString()
-	    determineOverview(channel,recalc,false);
+	    determineOverview(channel,false);
 	});
 	$('input[name="channel-select"]').on('click',function(){
 	    var channel  = $(this).attr('value');
-	    var nowTemp = new Date();
-	    var recalc = monthNum != (nowTemp.getMonth() + 1).toString() 
-	    determineOverview(channel, recalc,false);
+	    determineOverview(channel,false);
 	});
 	//$('#selectDQDICAO').popup('open')
 			
