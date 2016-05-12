@@ -3,9 +3,9 @@ var then = new Date(now.getTime() - 182.5 * 24 * 3600 * 1e3);
 var month = new Date(now.getTime() - (365/12) * 24 * 3600 * 1e3);
 var sevenDays = new Date(now.getTime() - 7 * 24 * 3600 * 1e3);
 var timeInterval = {
-			'7Days':sevenDays/1000,
-			'1Month':month/1000,
-			'6Months':then/1000
+			'sevenDays':sevenDays/1000,
+			'oneMonth':month/1000,
+			'sixMonths':then/1000
 };
 var numberToMonth = {
 	'1' : 'Jan',
@@ -22,7 +22,7 @@ var numberToMonth = {
 	'12' : 'Dec'
 }
 var weights = [0.25,0.33,0.42], // Weights for Rain, Snow, & Bragg methods, respectively
-    storeValues = {},
+    toolValues = {},
     storeData = {},
     year = now.getFullYear().toString(),
     monthNum = (now.getMonth() + 1).toString(),
@@ -54,9 +54,9 @@ function Interval()
     month.setUTCMonth(now.getUTCMonth(), 0)
     then.setTime(now.getTime() - 182.5 * 24 * 3600 * 1e3);
     var interval = {
-                        '7Days':sevenDays/1000,
-                        '1Month':month.getTime()/1000,
-                        '6Months':then/1000
+                        'sevenDays':sevenDays/1000,
+                        'oneMonth':month.getTime()/1000,
+                        'sixMonths':then/1000
     };
     return interval
 }
@@ -133,7 +133,6 @@ function setSizes(pageName, plotAdd)
     var SummaryData = storeData['SummaryData'],
         DailyData = storeData['DailyData'],
         redundantBool = storeData['redundantBool']
-	redundant = storeData['redundant']
     ;
     var method = pageName.replace('-page', ''),
         possibleChartName = method + '-container',
@@ -141,7 +140,7 @@ function setSizes(pageName, plotAdd)
         chartContainer = $('#' + possibleChartName)
 	
     ;
-    storeValues = {}
+    toolValues = {}
         
     if (chartContainer.length < 1)
         return;
@@ -154,18 +153,20 @@ function setSizes(pageName, plotAdd)
     ;
     var methodName = 'median' + method[0].toUpperCase() + method.slice(1) 
     if(redundantBool){
-	var chan1 = {'belowDataToPlot':[],'aboveDataToPlot':[]}	
-	    chan2 = {'belowDataToPlot':[],'aboveDataToPlot':[]}
-	; 
-        $.each(SummaryData, function (idx, obj) {
-                var channel = 'chan' + redundant[idx]
-                eval(channel)['belowDataToPlot'].push([obj.time * 1e3, obj[methodName] < 0 ? obj[methodName] : null]);
-                eval(channel)['aboveDataToPlot'].push([obj.time * 1e3, obj[methodName] >= 0 ? obj[methodName] : null]);
+        var redundantChart = {"Chan1" : {'belowDataToPlot':[],'aboveDataToPlot':[],'dailyPoints':[]},
+                              "Chan2": {'belowDataToPlot':[],'aboveDataToPlot':[],'dailyPoints':[]}
+        }
+        ;
+	$.each(SummaryData, function (idx, obj) {
+                var channel = 'Chan' + obj.redundantMode
+                redundantChart[channel]['belowDataToPlot'].push([obj.time * 1e3, obj[methodName] < 0 ? obj[methodName] : null]);
+                redundantChart[channel]['aboveDataToPlot'].push([obj.time * 1e3, obj[methodName] >= 0 ? obj[methodName] : null]);
                 overTolerance.push([obj.time * 1e3, -0.50 > obj[methodName] || obj[methodName] > 0.50 ? obj[methodName] : null]);
-                storeValues[obj.time * 1e3] = obj[methodName];
+                toolValues[obj.time * 1e3] = [obj[methodName],channel];
         });
         $.each(DailyData, function(idx, obj) {
-            dailyPoints.push([obj.time * 1e3, obj[methodName]]);
+            var channel = 'Chan' + obj.redundantMode
+            redundantChart[channel]['dailyPoints'].push([obj.time * 1e3, obj[methodName]]);
         });
     }
     else {
@@ -173,7 +174,7 @@ function setSizes(pageName, plotAdd)
                 belowDataToPlot.push([obj.time * 1e3, obj[methodName] < 0 ? obj[methodName] : null]);
                 aboveDataToPlot.push([obj.time * 1e3, obj[methodName] >= 0 ? obj[methodName] : null]);
                 overTolerance.push([obj.time * 1e3, -0.50 > obj[methodName] || obj[methodName] > 0.50 ? 0.50 : null]);
-                storeValues[obj.time * 1e3] = obj[methodName];
+                toolValues[obj.time * 1e3] = [obj[methodName],channel];
         });
         $.each(DailyData, function(idx, obj) {
             dailyPoints.push([obj.time * 1e3, obj[methodName]]);
@@ -199,10 +200,10 @@ function setSizes(pageName, plotAdd)
             }
         ]
     if (redundantBool){
-	for (p in plotAdd){
+	for (var p = 0; p < plotAdd.length; p++){
             plotOpts.push(
 		{
-		    data: eval(plotAdd[p])['belowDataToPlot'],
+		    data: redundantChart[plotAdd[p]]['belowDataToPlot'],
 		    lines:    {
 			show: true,
 			fill: true,
@@ -212,7 +213,7 @@ function setSizes(pageName, plotAdd)
 	    );
             plotOpts.push(
 		{
-		    data: eval(plotAdd[p])['aboveDataToPlot'],
+		    data: redundantChart[plotAdd[p]]['aboveDataToPlot'],
 		    lines:    {
 			show: true,	
 			fill: true,
@@ -220,6 +221,17 @@ function setSizes(pageName, plotAdd)
 		    }
 		}
 	    );
+        plotOpts.push(
+            {
+                data:redundantChart[plotAdd[p]]['dailyPoints'],
+                color:'black',
+                points: {
+                    show: true,
+                    symbol: plotAdd[p] == "Chan1" ? "circle" : "triangle",
+                }
+            }
+        );
+
     	}
     }
     else{
@@ -249,18 +261,19 @@ function setSizes(pageName, plotAdd)
                 }
             }
 	);
+        plotOpts.push(
+            {
+                data: dailyPoints,
+                color:'black',
+                points: {
+                    show: true,
+                    symbol: "circle"
+                }
+            }
+        );
+
     }
 
-    plotOpts.push(
-        {
-            data:dailyPoints,
-            color:'black',
-            points: {
-                show: true,
-                symbol: "cross",
-            }
-        }
-    );
     plotOpts.push(
 	{
 	    data: overTolerance,
@@ -313,14 +326,14 @@ function determineOverview(chan,initialData)
     var time = $('#time-form :checked').val()
     var timeInterval = Interval()
     if(redundantBool){
-	rBragg = {'chan1':[],'chan2':[]};
-        rSnow = {'chan1':[],'chan2':[]};
-        rRain = {'chan1':[],'chan2':[]};
+	rBragg = {'Chan1':[],'Chan2':[]};
+        rSnow = {'Chan1':[],'Chan2':[]};
+        rRain = {'Chan1':[],'Chan2':[]};
 	
-	if(time != 'MostRecent'){
+	if(time != 'latestVolume'){
             $.each(DailyData, function(idx,obj){
                 if(timeInterval[time] <= obj.time){
-		    var channel = 'chan' + redundant[idx]
+		    var channel = 'Chan' + obj.redundantMode
                     rBragg[channel].push(obj.medianBragg);
                     rSnow[channel].push(obj.medianSnow);
                     rRain[channel].push(obj.medianRain);
@@ -333,7 +346,7 @@ function determineOverview(chan,initialData)
         else {
 	    var copyData = JSON.parse(JSON.stringify(DailyData)).reverse()
 	    $.each(copyData,function(idx,obj) {
-		if (redundant[idx] == chan.replace('chan','')) {
+		if (obj.redundantMode == chan.replace('Chan','')) {
                     tRain = obj.medianRain;
             	    tSnow = obj.medianSnow;
             	    tBragg = obj.medianBragg;
@@ -344,7 +357,7 @@ function determineOverview(chan,initialData)
 		    
     }
     else {
-        if(time != 'MostRecent'){
+        if(time != 'latestVolume'){
             $.each(DailyData, function(idx,obj){
                 if(timeInterval[time] <= obj.time){
                     mBragg.push(obj.medianBragg);
@@ -469,7 +482,7 @@ function loadDQDData()
 		data['DailyData'][idx].medianSnow = obj.medianSnow > -99.0 ? obj.medianSnow : null;
 		data['DailyData'][idx].medianBragg = obj.medianBragg > -99.0 ? obj.medianBragg : null;
 	    });
-            determineOverview('chan1',data)
+            determineOverview('Chan1',data)
 	    $('#statsFound').html('Total ZDR Stats Processed: ' + data['statsFound'].toString())
 	    $('#endStamp').html('6 Month Period Ending: ' + now.getUTCDate() + ' ' + numberToMonth[(now.getUTCMonth() + 1).toString()] + ' ' + now.getUTCFullYear())
 	}
@@ -488,42 +501,52 @@ function loadDQDData()
 
 $(document).ready(function () {
 	$('#dqd-page-link').click()	
-       	$( ".chart-page" ).on( "click", function() {
-	    var pointClicked = false,
-		clicksYet = false,
-		previousPoint = null
-	    ;
-	    var pageName = $(this).attr('href').replace('#','')
-	    if ( !$.isEmptyObject(storeData) ) {
-		setSizes(pageName)
-		var page = pageName.replace('page','')
-		$("#"+page+"redundant #toggle").find("input[type='checkbox']").click(function () {
-		    var dataSet = [];
-		    $("#"+page+"redundant #toggle").find("input[type='checkbox']").each(function () {
-			if ($(this).is(":checked")) {
-			    var position = $(this).attr("id");
-			    dataSet.push(position);
-			}
-		    });
-		    setSizes(pageName,dataSet)
-		});
-		$("#"+page+"container").bind("plothover",function(event, pos, item) {
+       	$( ":mobile-pagecontainer" ).on( "pagecontainershow", function() {
+	    var pageName = $(this)[0].baseURI.split('#')[1]
+	    var page = pageName.replace('-page','')
+	    if ( ['rain-page','snow-page','bragg-page'].indexOf(pageName) >= 0) {
+	        var pointClicked = false,
+	            clicksYet = false,
+	      	    previousPoint = null
+	        ;
+	        if ( !$.isEmptyObject(storeData) ) {
+		    var channel = $('#channel-form :checked').val()
+		    if ( storeData['redundantBool'] ) { 
+                        $('input[name=channel-toggle]').prop('checked',false).trigger('refresh');
+                        $('#' + page + channel).prop('checked',true).checkboxradio('refresh');
+		 	setSizes(pageName, [channel])
+                        $('input[name=channel-toggle]').on("click", function() {
+                            var name = $(this).attr("class")
+                            var selectedChannels = $('input[type="checkbox"]').filter('.' + name).map(function(){
+                                if ( $(this).is(':checked') )
+                                    return $(this).val();
+                            });
+                            setSizes(pageName, selectedChannels); 
+                        });
+		    }
+		    else { 
+			setSizes(pageName, [channel])
+		    }
+		}	
+		$("#"+page+"-container").bind("plothover",function(event, pos, item) {
 		    if (item) {
+			console.log(item)
 			if (previousPoint != item.datapoint) {	
 			    previousPoint = item.datapoint;
 			    $("#tooltip").remove();
 			    var x = item.datapoint[0],
 				y = item.datapoint[1]
 			    ;
-			    var actual = storeValues[x]
+			    var actual = toolValues[x] 
 			    if (Math.abs(y) < 0.50)
 				var actual = y;
 			    var d = new Date(x)
 			    var month = d.getUTCMonth()+1;
 			    var day = d.getUTCDate();
 			    var year = d.getUTCFullYear();
+			    var chan = toolValues[x][1] ? toolValues[x][1] + " " : ""
 			    showTooltip(item.pageX, item.pageY, 
-				actual.toFixed(2) +"dB on "+ month+"/"+day+"/"+year
+				chan + actual.toFixed(2) +"dB on "+ month+"/"+day+"/"+year
 			    );
 			}
 		    }
@@ -547,14 +570,14 @@ $(document).ready(function () {
 	    $('#selectDQDICAO').popup('close');
 	    loadDQDData();
 	});
-	$('#choice-4').prop('checked',true).click();
-	$('#choice-5').prop('checked',true).click();
+	$('#latestVolume').prop('checked',true).click();
+	$('#overviewChan1').prop('checked',true).click();
 	
 	$('input[name="time-select"]').on('click',function(){
 	    var channel = $('#channel-form :checked').val()
 	    determineOverview(channel,false);
 	});
-	$('input[name="channel-select"]').on('click',function(){
+	$('input[name="overview-channel-select"]').on('click',function(){
 	    var channel  = $(this).attr('value');
 	    determineOverview(channel,false);
 	});

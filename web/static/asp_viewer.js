@@ -6,6 +6,10 @@ var logInfo = "N/A"
 
 function loadData(loadString) 
 {
+    $('input[name="logFilter"]').each(function(idx,element) {
+        $(element).prop('checked',true).checkboxradio('refresh')
+        $('.' + $(this).attr('id')).css('display','initial')
+    });
     logInfo = loadString;
     $('.ui-loader').css('display','initial')
     $.getJSON(loadPre + loadString, function (data) {
@@ -28,8 +32,14 @@ function loadData(loadString)
 	})
         $('#downloadLog').on('click',function() {
             var log = logInfo +"\n Filter String: " + $('#filterTable-input').attr('data-lastval') + '\n'
+	    var filteredRaw = $('input[name="logFilter"]:not(:checked)')
+	    var filters = $.map(filteredRaw, function(obj,idx) { return obj.id });
+	    var filterOut = filters.length > 0 ? filters.join() : "None"
+	    console.log(filterOut)
+	    log += "Message Filters Active: " + filterOut + '\n'
             $('#logBody').find('tr').each(function (idx,obj) {
-                if (obj.firstChild != null && obj.className.indexOf('ui-screen-hidden') < 0)
+		console.log(obj)	
+                if (obj.firstChild != null && obj.className.indexOf('ui-screen-hidden') < 0 && obj.style.display != "none")
                     log += obj.className + ',' + obj.firstChild.data + '\n'
             });
             var link = document.createElement('a');
@@ -38,7 +48,7 @@ function loadData(loadString)
             document.body.appendChild(link)
             link.click()
             setTimeout(function(){
-                document.body.removeChild(link);//remove element
+                document.body.removeChild(link);  //remove element
             }, 1);
         });
 

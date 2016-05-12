@@ -131,27 +131,37 @@ def parse_date_time(zdr_date_time_str):
 def parse_zdr_stats(zdr_split):
     if len(zdr_split) != 2:
         return None
+
     if '(Bragg)' in zdr_split[1]:
+	if 'RDA' in zdr_split[1]:
+	    redundant = re.findall('RDA:(.*?)]', zdr_split[1])[0]
+	else: 
+	    redundant = 1
+	stat_date_time = parse_date_time(zdr_split[0])
         if 'Unavailable' in zdr_split[1] or 'Last detection' in zdr_split[1]:
-            return None
+            return {'redundant':redundant,'time':time.mktime(stat_date_time.timetuple())}
         else:
             if 'RDA' in zdr_split[1]:
-                redundant = re.findall('RDA:(.*?)]', zdr_split[1])[0]
-                take_from = zdr_split[1][(zdr_split[1].index(']') + 2):].rstrip('\x00')
+                take_from = zdr_split[1][(zdr_split[1].index(']') + 2):].rstrip('\0')
             else:
                 redundant = 0
-                take_from = zdr_split[1][(zdr_split[1].index(':') + 1):].rstrip('\x00')
+                take_from = zdr_split[1][(zdr_split[1].index(':') + 1):].rstrip('\0')
             stat_date_time = parse_date_time(zdr_split[0])
             (twelve_vol_bias, twelve_vol_count, cur_vol_bias, cur_vol_count, cur_vol_iqr, cur_vol_90, cur_vol_vcp,) = take_from.split('/')
             if float(twelve_vol_bias) > -99:
-                return {'type': 'bragg',
-                 'time': time.mktime(stat_date_time.timetuple()),
-                 'volumeBias': {'last12': float(twelve_vol_bias),
-                                'current': float(cur_vol_bias)},
-                 'redundant': redundant}
-            return None
+                return {
+		         'type': 'bragg',
+                         'time': time.mktime(stat_date_time.timetuple()),
+                 	 'volumeBias': {
+				'last12': float(twelve_vol_bias),
+                                'current': float(cur_vol_bias)
+			 },
+                 	 'redundant': redundant
+		}
+	    else: 
+                return None
     else:
-        take_from = zdr_split[1][(zdr_split[1].index(':') + 1):].rstrip('\x00')
+        take_from = zdr_split[1][(zdr_split[1].index(':') + 1):].rstrip('\0')
         (rain_raw, dry_snow_raw,) = take_from.split('DS')
         stat_date_time = parse_date_time(zdr_split[0])
         rain_raw = rain_raw.split(',')
@@ -222,29 +232,30 @@ def dqdwalk(rand_dirname):
             median_bragg_daily = np.median([ d['volumeBias']['last12'] for d in day if 'type' in d if d['volumeBias']['last12'] > -99.0 ])
         except IndexError:
             median_bragg_daily = -99.0
-        redundant_list = [ int(d['redundant']) for d in day if 'redundant' in d ]
-        if redundant_list:
-            mode_redundant = int(np.argmax(np.bincount(np.array(redundant_list))))
-        else:
-            mode_redundant = 1
-        summary.append({'time': time.mktime(now.timetuple()),
+        redundant_daily = [int(d['redundant']) for d in day if 'redundant' in d]
+        redundant_summary = [int(z['redundant']) for z in els if 'redundant' in z]
+        daily_mode = int(np.argmax(np.bincount(np.array(redundant_daily))))
+        summary_mode = int(np.argmax(np.bincount(np.array(redundant_summary))))
+		
+	summary.append({'time': time.mktime(now.timetuple()),
          'medianRain': stripNaN(median_rain),
          'medianSnow': stripNaN(median_snow),
          'medianBragg': stripNaN(median_bragg),
+	 'redundantMode':summary_mode
         })
         daily.append({'time': time.mktime(now.timetuple()),
          'medianRain': stripNaN(median_rain_daily),
          'medianSnow': stripNaN(median_snow_daily),
          'medianBragg': stripNaN(median_bragg_daily),
+	 'redundantMode':daily_mode
         })
-	redundant.append(mode_redundant)
         i += idx_today
-    redundantBool = 1 in redundant and 2 in redundant
+    redundant = [r['redundantMode'] for r in summary]
+    redundantBool = 2 in redundant
     out_dict = {
 		'redundantBool': redundantBool,
      		'SummaryData': summary,
      		'DailyData': daily,
-     		'redundant':redundant,
      		'statsFound': stats_found
     }
     
