@@ -22,7 +22,8 @@ var numberToMonth = {
 	'12' : 'Dec'
 }
 var weights = [0.25,0.33,0.42], // Weights for Rain, Snow, & Bragg methods, respectively
-    toolValues = {},
+    summaryToolValues = {},
+    dailyToolValues = {},
     storeData = {},
     year = now.getFullYear().toString(),
     monthNum = (now.getMonth() + 1).toString(),
@@ -140,7 +141,8 @@ function setSizes(pageName, plotAdd)
         chartContainer = $('#' + possibleChartName)
 	
     ;
-    toolValues = {}
+    summaryToolValues = {}
+    dailyToolValues = {}
         
     if (chartContainer.length < 1)
         return;
@@ -161,12 +163,13 @@ function setSizes(pageName, plotAdd)
                 var channel = 'Chan' + obj.redundantMode
                 redundantChart[channel]['belowDataToPlot'].push([obj.time * 1e3, obj[methodName] < 0 ? obj[methodName] : null]);
                 redundantChart[channel]['aboveDataToPlot'].push([obj.time * 1e3, obj[methodName] >= 0 ? obj[methodName] : null]);
-                overTolerance.push([obj.time * 1e3, -0.50 > obj[methodName] || obj[methodName] > 0.50 ? obj[methodName] : null]);
-                toolValues[obj.time * 1e3] = [obj[methodName],channel];
+                overTolerance.push([obj.time * 1e3, -0.50 > obj[methodName] || obj[methodName] > 0.50 ? 0.50 : null]);
+		summaryToolValues[obj.time * 1e3] = [obj[methodName],channel];
         });
         $.each(DailyData, function(idx, obj) {
             var channel = 'Chan' + obj.redundantMode
             redundantChart[channel]['dailyPoints'].push([obj.time * 1e3, obj[methodName]]);
+	    dailyToolValues[obj.time * 1e3] = [obj[methodName],channel];
         });
     }
     else {
@@ -174,10 +177,11 @@ function setSizes(pageName, plotAdd)
                 belowDataToPlot.push([obj.time * 1e3, obj[methodName] < 0 ? obj[methodName] : null]);
                 aboveDataToPlot.push([obj.time * 1e3, obj[methodName] >= 0 ? obj[methodName] : null]);
                 overTolerance.push([obj.time * 1e3, -0.50 > obj[methodName] || obj[methodName] > 0.50 ? 0.50 : null]);
-                toolValues[obj.time * 1e3] = [obj[methodName],channel];
+		summaryToolValues[obj.time * 1e3] = [obj[methodName],false];
         });
         $.each(DailyData, function(idx, obj) {
             dailyPoints.push([obj.time * 1e3, obj[methodName]]);
+            dailyToolValues[obj.time * 1e3] = [obj[methodName],false];
         });
 
     }
@@ -273,7 +277,6 @@ function setSizes(pageName, plotAdd)
         );
 
     }
-
     plotOpts.push(
 	{
 	    data: overTolerance,
@@ -500,10 +503,12 @@ function loadDQDData()
 
 
 $(document).ready(function () {
-	$('#dqd-page-link').click()	
        	$( ":mobile-pagecontainer" ).on( "pagecontainershow", function() {
 	    var pageName = $(this)[0].baseURI.split('#')[1]
 	    var page = pageName.replace('-page','')
+	    if ( pageName == "dqd-page" ) 
+		$('#selectDQDICAO').popup('open')
+
 	    if ( ['rain-page','snow-page','bragg-page'].indexOf(pageName) >= 0) {
 	        var pointClicked = false,
 	            clicksYet = false,
@@ -530,21 +535,22 @@ $(document).ready(function () {
 		}	
 		$("#"+page+"-container").bind("plothover",function(event, pos, item) {
 		    if (item) {
-			console.log(item)
 			if (previousPoint != item.datapoint) {	
 			    previousPoint = item.datapoint;
 			    $("#tooltip").remove();
 			    var x = item.datapoint[0],
-				y = item.datapoint[1]
+				y = item.datapoint[1],
+				l = item.datapoint.length
 			    ;
-			    var actual = toolValues[x] 
+			    var actualValues = l == 3 || item.seriesIndex == 5 ? summaryToolValues[x] : dailyToolValues[x]
+			    var actual = actualValues[0]
 			    if (Math.abs(y) < 0.50)
 				var actual = y;
 			    var d = new Date(x)
 			    var month = d.getUTCMonth()+1;
 			    var day = d.getUTCDate();
 			    var year = d.getUTCFullYear();
-			    var chan = toolValues[x][1] ? toolValues[x][1] + " " : ""
+			    var chan = actualValues[1] ? actualValues[1] + " " : ""
 			    showTooltip(item.pageX, item.pageY, 
 				chan + actual.toFixed(2) +"dB on "+ month+"/"+day+"/"+year
 			    );
@@ -581,7 +587,5 @@ $(document).ready(function () {
 	    var channel  = $(this).attr('value');
 	    determineOverview(channel,false);
 	});
-	//$('#selectDQDICAO').popup('open')
-			
 	
 });

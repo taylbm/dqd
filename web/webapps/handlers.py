@@ -16,6 +16,13 @@ import numpy as np
 import time
 import bisect
 import re
+from email.MIMEText import MIMEText
+from email.MIMEMultipart import MIMEMultipart
+import smtplib
+
+
+sender = 'dqd@lnxrpg5'
+recipient = 'Brandon.M.Taylor@noaa.gov'
 
 HERE = os.path.split(os.path.abspath(__file__))[0]
 PARENT = os.path.split(HERE)[0]
@@ -135,17 +142,14 @@ def parse_zdr_stats(zdr_split):
     if '(Bragg)' in zdr_split[1]:
 	if 'RDA' in zdr_split[1]:
 	    redundant = re.findall('RDA:(.*?)]', zdr_split[1])[0]
+	    take_from = zdr_split[1][(zdr_split[1].index(']') + 2):].rstrip('\0')
 	else: 
+	    take_from = zdr_split[1][(zdr_split[1].index(':') + 1):].rstrip('\0')
 	    redundant = 1
 	stat_date_time = parse_date_time(zdr_split[0])
         if 'Unavailable' in zdr_split[1] or 'Last detection' in zdr_split[1]:
             return {'redundant':redundant,'time':time.mktime(stat_date_time.timetuple())}
         else:
-            if 'RDA' in zdr_split[1]:
-                take_from = zdr_split[1][(zdr_split[1].index(']') + 2):].rstrip('\0')
-            else:
-                redundant = 0
-                take_from = zdr_split[1][(zdr_split[1].index(':') + 1):].rstrip('\0')
             stat_date_time = parse_date_time(zdr_split[0])
             (twelve_vol_bias, twelve_vol_count, cur_vol_bias, cur_vol_count, cur_vol_iqr, cur_vol_90, cur_vol_vcp,) = take_from.split('/')
             if float(twelve_vol_bias) > -99:
@@ -233,10 +237,16 @@ def dqdwalk(rand_dirname):
         except IndexError:
             median_bragg_daily = -99.0
         redundant_daily = [int(d['redundant']) for d in day if 'redundant' in d]
-        redundant_summary = [int(z['redundant']) for z in els if 'redundant' in z]
-        daily_mode = int(np.argmax(np.bincount(np.array(redundant_daily))))
-        summary_mode = int(np.argmax(np.bincount(np.array(redundant_summary))))
-		
+	redundant_summary = [int(z['redundant']) for z in els if 'redundant' in z]
+	if redundant_daily:
+	    daily_mode = int(np.argmax(np.bincount(np.array(redundant_daily))))
+        else:
+	    daily_mode = 1
+	if redundant_summary:	
+	    summary_mode = int(np.argmax(np.bincount(np.array(redundant_summary))))
+	else:
+	    summary_mode = 1
+	
 	summary.append({'time': time.mktime(now.timetuple()),
          'medianRain': stripNaN(median_rain),
          'medianSnow': stripNaN(median_snow),
@@ -326,4 +336,23 @@ class DQDwalk(object):
         else:
             ret = 'Invalid ICAO'
         return json.dumps(ret)
+class Feedback(object):
+    def GET(self):
+	user_submission = web.input(error=None,email=None,comments=None)
+	if user_submission.error:
+	    text = MIMEText("Here is your feedback as received: \n Error Type: %s \n Email: %s \n Comments: %s \n Expect a follow-up in a day or two. \n Cheers, Brandon" % (user_submission.error,user_submission.email,user_submission.comments)) 
+	    recipients = [recipient] 
+	    text['Subject'] = 'DQD Feedback'
+	    text['From'] = sender
+	    s = smtplib.SMTP('localhost')
+	    try: 
+		if user_submission.email:
+		    recipients.append(user_submission.email)
+		text['To'] = ", ".join(recipients)
+		s.sendmail(sender,recipients,text.as_string())
+		return json.dumps('Thank You. Your response has been received.')      
+	    except:
+		return json.dumps('Message Send Failure') 
+	else:
+	    return json.dumps('Empty/Invalid Response')
 

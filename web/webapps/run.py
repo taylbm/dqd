@@ -21,7 +21,8 @@ URLS = (
     '/','handlers.IndexView',           # you can list other handlers here
     '/button','handlers.Button',
     '/dqdwalk','handlers.DQDwalk',
-    '/aspwalk','handlers.ASPwalk'
+    '/aspwalk','handlers.ASPwalk',
+    '/feedback','handlers.Feedback'
 )
 
 application = web.application(URLS, globals()).wsgifunc()

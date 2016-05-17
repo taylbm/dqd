@@ -14,7 +14,6 @@
 ###
 
 <%inherit file="layout.mako" />
-<%include file="asp_viewer.html"/>
 
 ###
 ### namespaces
@@ -36,9 +35,6 @@
 		            <li data-role="list-divider">
 		                ZDR Bias
 		            </li>
-		            <li data-icon="home">
-		                <a name="home"href="#dqd-page">Home</a>
-		            </li>
 		            <li>
 		                <a class="chart-page" name="rain" href="#rain-page">Rain method</a>
 		            </li>
@@ -48,6 +44,15 @@
 		            <li>
 		                <a class="chart-page" name="bragg" href="#bragg-page">Bragg method</a>
 		            </li>
+                            <li data-role="list-divider">
+                                Issues
+                            </li>
+                            <li>
+                                <a class="chart-page" name="issue" href="#issue-page">Submit Feedback</a>
+                            </li>
+
+				
+				
 		        </ul>
 	    </div>
             <div data-role="header" style="overflow:hidden;" data-theme="b">
@@ -159,9 +164,6 @@
                     <li data-role="list-divider">
                         ZDR Bias
                     </li>
-                    <li data-icon="home">
-                        <a name="home" href="#dqd-page">Home</a>
-                    </li>
                     <li>
                         <a class="chart-page" name="rain" href="#rain-page">Rain method</a>
                     </li>
@@ -171,12 +173,20 @@
                     <li>
                         <a class="chart-page" name="bragg" href="#bragg-page">Bragg method</a>
                     </li>
+                    <li data-role="list-divider">
+                        Issues
+                    </li>
+                    <li>
+                        <a class="chart-page" name="issue" href="#issue-page">Submit Feedback</a>
+                    </li>
+
                 </ul>
             </div>
         
             <div data-role="header">
                 <h2>ZDR Bias - ${name.capitalize()}</h2>
-                <a href="#${name}-nav-panel" class="ui-btn-right ui-btn ui-btn-inline ui-btn-icon-right ui-icon-bars ui-shadow">Menu</a>
+                <a href="#${name}-nav-panel" class="ui-btn-right ui-btn ui-btn-inline ui-btn-icon-right ui-icon-bars ui-shadow">Menu</a>	
+		<a href="#dqd-page" class="ui-btn-left ui-btn ui-btn-inline ui-btn-icon-left ui-icon-home ui-shadow">Home</a>
             </div>
             <div id="${name}-main" role="main" class="ui-content">
                 <h2 class="sites" align="center"></h2><h4 align="center">7 Day Running Median Shading/Daily Median Points</h4>
@@ -195,4 +205,49 @@
                 <h3>NEXRAD Radar Operations Center - INTERNAL USE ONLY</h3>
             </div>
         </div>
-        % endfor 
+        % endfor
+
+        <div id="issue-page" data-role="page">
+            <div id="issue-nav-panel" data-role="panel" data-position="right" data-display="overlay">
+                <ul data-role="listview">
+                    <li data-role="list-divider">
+                        ZDR Bias
+                    </li>
+                    <li>
+                        <a class="chart-page" name="rain" href="#rain-page">Rain method</a>
+                    </li>
+                    <li>
+                        <a class="chart-page" name="snow" href="#snow-page">Snow method</a>
+                    </li>
+                    <li>
+                        <a class="chart-page" name="bragg" href="#bragg-page">Bragg method</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div data-role="header">
+                <h2>Issue/Feedback Form</h2>
+                <a href="#issue-nav-panel" class="ui-btn-right ui-btn ui-btn-inline ui-btn-icon-right ui-icon-bars ui-shadow">Menu</a>
+                <a href="#dqd-page" class="ui-btn-left ui-btn ui-btn-inline ui-btn-icon-left ui-icon-home ui-shadow">Home</a>
+            </div>
+            <div id="issue-main" role="main" class="ui-content">
+		<form target="_blank" action="dqd/feedback" id="submit-feedback">
+		    <label for="error">Error Description - Please provide the ICAO and time range if possible/applicable:</label>
+		    <input name="error" id="error" placeholder="ie. Internal Server Error" value="" type="text">
+                    <label for="email">E-Mail Address - for confirmation and follow-up:</label>
+                    <input name="email" id="email" placeholder="(optional)" value="" type="text">
+	 	    <label for="comments">Additional Comments:</label>
+		    <textarea cols="40" rows="8" name="comments" id="comments"></textarea>
+		    <button class="ui-shadow ui-btn ui-corner-all" type="submit" id="submit-feedback">Submit</button>
+		    <p>You can also contact the developer directly at Brandon.M.Taylor@noaa.gov</p>
+        	</form>
+	    </div>
+            <div data-role="footer">
+                <h3>NEXRAD Radar Operations Center - INTERNAL USE ONLY</h3>
+            </div>
+        </div>
+
+	
+
+<%include file="asp_viewer.html"/>
+
