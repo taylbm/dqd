@@ -203,7 +203,6 @@ def dqdwalk(rand_dirname):
     i = 0
     summary = []
     daily = []
-    redundant = []
     while i < len(zdr_processed):	
         el = zdr_processed[i]
         now = times[i]
@@ -213,39 +212,39 @@ def dqdwalk(rand_dirname):
         els = zdr_processed[i:(i + idx_7)]
         day = zdr_processed[i:(i + idx_today)]
         try:
-            median_rain = np.median([ z['rain']['zdrError'] for z in els if 'rain' in z if z['rain']['zdrError'] > -99.0 ])
+            rain = [z['rain']['zdrError'] for z in els if 'rain' in z and z['rain']['zdrError'] > -99.0]
+            median_rain = float(np.round(np.median(rain),decimals=2)) if rain else np.nan
         except IndexError:
             median_rain = -99.0
         try:
-            median_rain_daily = np.median([ d['rain']['zdrError'] for d in day if 'rain' in d if d['rain']['zdrError'] > -99.0 ])
+            rain_daily = [d['rain']['zdrError'] for d in day if 'rain' in d and d['rain']['zdrError'] > -99.0]
+            median_rain_daily = float(np.round(np.median(rain_daily),decimals=2)) if rain_daily else np.nan
         except IndexError:
             median_rain_daily = -99.0
         try:
-            median_snow = np.median([ z['snow']['zdrError'] for z in els if 'snow' in z if z['snow']['zdrError'] > -99.0 ])
+            snow = [z['snow']['zdrError'] for z in els if 'snow' in z and z['snow']['zdrError'] > -99.0]
+            median_snow = float(np.round(np.median(snow),decimals=2)) if snow else np.nan
         except IndexError:
             median_snow = -99.0
         try:
-            median_snow_daily = np.median([ d['snow']['zdrError'] for d in day if 'snow' in d if d['snow']['zdrError'] > -99.0 ])
+            snow_daily = [d['snow']['zdrError'] for d in day if 'snow' in d and d['snow']['zdrError'] > -99.0]
+            median_snow_daily = float(np.round(np.median(snow_daily),decimals=2)) if snow_daily else np.nan
         except IndexError:
             median_snow_daily = -99.0
         try:
-            median_bragg = np.median([ z['volumeBias']['last12'] for z in els if 'type' in z if z['volumeBias']['last12'] > -99.0 ])
+            bragg = [z['volumeBias']['last12'] for z in els if 'type' in z and z['volumeBias']['last12'] > -99.0]
+            median_bragg = float(np.round(np.median(bragg),decimals=2)) if bragg else np.nan
         except IndexError:
             median_bragg = -99.0
         try:
-            median_bragg_daily = np.median([ d['volumeBias']['last12'] for d in day if 'type' in d if d['volumeBias']['last12'] > -99.0 ])
+            bragg_daily = [d['volumeBias']['last12'] for d in day if 'type' in d and d['volumeBias']['last12'] > -99.0]
+            median_bragg_daily = float(np.round(np.median(bragg_daily),decimals=2)) if bragg_daily else np.nan
         except IndexError:
-            median_bragg_daily = -99.0
-        redundant_daily = [int(d['redundant']) for d in day if 'redundant' in d]
+            median_bragg_daily = -99.0        
+	redundant_daily = [int(d['redundant']) for d in day if 'redundant' in d]
 	redundant_summary = [int(z['redundant']) for z in els if 'redundant' in z]
-	if redundant_daily:
-	    daily_mode = int(np.argmax(np.bincount(np.array(redundant_daily))))
-        else:
-	    daily_mode = 1
-	if redundant_summary:	
-	    summary_mode = int(np.argmax(np.bincount(np.array(redundant_summary))))
-	else:
-	    summary_mode = 1
+	daily_mode = int(np.argmax(np.bincount(np.array(redundant_daily)))) if redundant_daily else 1
+        summary_mode = int(np.argmax(np.bincount(np.array(redundant_summary)))) if redundant_summary else 1
 	
 	summary.append({'time': time.mktime(now.timetuple()),
          'medianRain': stripNaN(median_rain),
