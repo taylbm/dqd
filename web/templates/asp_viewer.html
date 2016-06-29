@@ -29,29 +29,52 @@
 ###
 
 <div id="asp-view" data-role="page">
+    <div id="nav-panel" data-role="panel" data-position="right" data-display="overlay">
+                <ul data-role="listview">
+                    <li data-role="list-divider">
+                        Data Quality Dashboard
+                    </li>
+                    <li>
+                        <a href="#dqd-page">DQD</a>
+                    </li>
+                    <li data-role="list-divider">
+                        Archived Status Products
+                    </li>
+                    <li>
+                        <a href="http://swewww/asp_view" rel="external" target="_blank" data-icon="action">ASP Viewer</a>
+                    </li>
+                    <li>
+                        <a href="#asp-view" data-icon="bullets">ASP Viewer Beta</a>
+                    </li>
+                    <li data-role="list-divider">
+                        Issues
+                    </li>
+                    <li>
+                        <a class="chart-page" name="issue" href="#issue-page">Submit Feedback</a>
+                    </li>
+                    <li>
+                        <a target="_blank" href="https://docs.google.com/a/noaa.gov/spreadsheets/d/1ITrfO_KmNXUFaJPJsPLrjgXr7n6xSAxL7hihkD2E4R8/edit?usp=sharing">View Feedback</a>
+                    </li>
+                </ul>
+    </div>
     <div data-role="header" style="overflow:hidden;" data-theme="b">
         <div class="ui-grid-c">
-            <div class="ui-block-a" style="width:10%">
-                <img style="height:100px" src="dqd/static/ROC_logo.png"></img>
+            <div class="ui-block-a" style="width:5%">
+                <img style="height:50px" src="dqd/static/ROC_logo.png"></img>
             </div>
-            <div class="ui-block-b" style="width:10%">
-                <img style="height:100px" src="dqd/static/NWS_logo.svg"></img>
+            <div class="ui-block-b" style="width:5%">
+                <img style="height:50px" src="dqd/static/NWS_logo.svg"></img>
             </div>
-            <div class="ui-block-c" style="width:10%">
-                <img style="height:100px" src="dqd/static/NOAA_logo.svg"></img>
+            <div class="ui-block-c" style="width:5%">
+                <img style="height:50px" src="dqd/static/NOAA_logo.svg"></img>
             </div>
-            <h1 class="ui-block-d" style="text-align:center;width:70%;margin-top:2%;margin-bottom:2%">Archived Status Product Viewer Beta</h1>
+           <h2 class="ui-block-d" style="text-align:center;width:70%;margin-top:0.5%;">Archived Status Product Viewer Beta</h2>
         </div>
-        <div data-role="navbar" data-iconpos="right">
-            <ul>
-                <li><a href="http://swewww/asp_view" rel="external" target="_blank" data-icon="action">ASP Viewer</a></li>
-                <li><a id="dqd-page-link" href="#dqd-page" data-icon="grid">Data Quality Dashboard</a></li>
-           </ul>
-        </div><!-- /navbar -->
+        <a href="#nav-panel" class="ui-btn-right ui-btn-a ui-btn ui-btn-inline ui-btn-icon-right ui-icon-bars ui-shadow">Menu</a>
     </div><!-- /header -->
 
-    <div class="ui-body ui-body-a ui-grid-a" style="margin-top:1%">
-	<div class="ui-block-a" style="width:40%">
+<div class="container" style="width:1300px;margin: 0 auto;">
+    <div class="ui-body ui-body-a ui-grid-a">
         <div data-role="popup" id="popupMenu">
             <form>
             <fieldset data-role="controlgroup">
@@ -97,56 +120,51 @@
             % endfor
             </ul>
         </div>
-        <div style="margin-top:1%;" id="datep" data-range="true" type="text" data-language="en" class="datepicker-here" data-position="right top" align="center"></div>
-        <div class="ui-grid-a">
-	    <div class="ui-block-a" style="width:30%">
-                <form>
+	<div class="ui-grid-d">
+            <div style="margin-right:1%;"class="ui-block-a" id="date-picker-contain">
+                <input id="datep" data-range="true" type="text" data-language="en" class="datepicker-here" data-position="right top" align="center"></input>
+            </div>
+            <form class="ui-block-b" style="width:15%">
 	        <fieldset data-role="controlgroup" data-type="horizontal">
                     <input name="rangeToggle" id="Range" value="1" checked="checked" type="radio"></input>
 		    <label for="Range">Range</label>
                     <input name="rangeToggle" id="Day" value="0" type="radio"></input>
 		    <label for="Day">Day</label>
                 </fieldset>
-                </form>
-	    </div>
-            <div class="ui-block-b" style="width:70%">
+            </form>
+            <div class="ui-block-c" style="width:">
                 <a href="#" id="submitDate" class="ui-shadow ui-btn ui-corner-all ui-btn-icon-left ui-icon-check" >Submit</a>
             </div>
+            <div style="width:" class="ui-block-d">
+                <a href="#popupMenu" data-rel="popup" class="ui-btn ui-corner-all ui-shadow ui-icon-gear ui-btn-icon-left ui-btn-a">Message Filter</a> 
+    	    </div>
+	    <div style="width:" class="ui-block-e">
+	        <a id="selectICAObutton" href="#selectICAO" data-rel="popup" class="ui-btn ui-corner-all ui-shadow ui-icon-location ui-btn-icon-left ui-btn-a">Select Site</a>
+	    </div>
 	</div>
-	<br><br>
-	<div class="ui-grid-a">
+        <form>
+            <input id="filterTable-input" data-type="search">
+        </form>
+        <table data-role="table" data-filter="true" data-input="#filterTable-input" class="ui-responsive" id="logTable">
+            <tbody id="logBody">
+	    <tr></tr>
+            </tbody>
+        </table>
+        <div class="ui-grid-a">
             <div style="width:" class="ui-block-a">
                 <a id="printPage" data-rel="popup" class="ui-btn ui-corner-all ui-shadow ui-icon-comment ui-btn-icon-left ui-btn-a">Print Page</a>
             </div>
             <div style="width:" class="ui-block-b">
                 <a id="downloadLog" class="ui-btn ui-corner-all ui-shadow ui-icon-arrow-d ui-btn-icon-left ui-btn-a">Download Log</a>
             </div>
-	</div>
-	</div>
-	<div class="ui-block-b" style="width:60%">
-        <div class="ui-grid-b">
-            <div style="width:" class="ui-block-a">
-                <a href="#popupMenu" data-rel="popup" class="ui-btn ui-corner-all ui-shadow ui-icon-gear ui-btn-icon-left ui-btn-a">Message Filter</a> 
-    	    </div>
-	    <div style="width:" class="ui-block-b">
-	        <a id="selectICAObutton" href="#selectICAO" data-rel="popup" class="ui-btn ui-corner-all ui-shadow ui-icon-location ui-btn-icon-left ui-btn-a">Select Site</a>
-	    </div>
-	    <div style="width:" class="ui-block-c">
-                <form>
-                <input id="filterTable-input" data-type="search">
-                </form>
-	    </div>
         </div>
-        <table data-role="table" data-filter="true" data-input="#filterTable-input" class="ui-responsive" id="logTable">
-            <tbody id="logBody">
-	    <tr></tr>
-            </tbody>
-        </table>	
-	</div>
+	
     </div>
-    <div data-role="footer">
-	<h4>NEXRAD Radar Operations Center - INTERNAL USE ONLY</h4>
-    </div>
+</div>
+<div data-role="footer">
+    <h4>NEXRAD Radar Operations Center - INTERNAL USE ONLY</h4>
+</div>
+
 </div>
 
 

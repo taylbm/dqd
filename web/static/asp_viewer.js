@@ -53,6 +53,7 @@ function loadData(loadString)
         });
 
 	$('#datep').datepicker({
+	    todayButton:true,
 	    minDate: new Date(2008, 12, 1),
 	    maxDate: new Date()
 	});

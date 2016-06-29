@@ -35,6 +35,9 @@
 		            <li data-role="list-divider">
 		                ZDR Bias
 		            </li>
+                            <li>
+                               <a href="#fullchart-page">3-Panel Overview</a>
+                            </li>
 		            <li>
 		                <a class="chart-page" name="rain" href="#rain-page">Rain method</a>
 		            </li>
@@ -45,6 +48,15 @@
 		                <a class="chart-page" name="bragg" href="#bragg-page">Bragg method</a>
 		            </li>
                             <li data-role="list-divider">
+                                Archived Status Products
+                            </li>
+                            <li>
+				<a href="http://swewww/asp_view" rel="external" target="_blank" data-icon="action">ASP Viewer</a>
+			    </li>
+                            <li>
+			        <a href="#asp-view" data-icon="bullets">ASP Viewer Beta</a>
+			    </li>
+                            <li data-role="list-divider">
                                 Issues
                             </li>
                             <li>
@@ -52,29 +64,23 @@
                             </li>
                             <li>
                                 <a target="_blank" href="https://docs.google.com/a/noaa.gov/spreadsheets/d/1ITrfO_KmNXUFaJPJsPLrjgXr7n6xSAxL7hihkD2E4R8/edit?usp=sharing">View Feedback</a>
-                            </li>		
+                            </li>	
 		        </ul>
 	    </div>
             <div data-role="header" style="overflow:hidden;" data-theme="b">
                 <div class="ui-grid-c">
-        	    <div class="ui-block-a" style="width:10%">
-            	 	<img style="height:100px" src="dqd/static/ROC_logo.png"></img>
+        	    <div class="ui-block-a" style="width:5%">
+            	 	<img style="height:50px" src="dqd/static/ROC_logo.png"></img>
         	    </div>
-                    <div class="ui-block-b" style="width:10%">
-                 	<img style="height:100px" src="dqd/static/NWS_logo.svg"></img>
+                    <div class="ui-block-b" style="width:5%">
+                 	<img style="height:50px" src="dqd/static/NWS_logo.svg"></img>
             	    </div>
-            	    <div class="ui-block-c" style="width:10%">
-            		<img style="height:100px" src="dqd/static/NOAA_logo.svg"></img>
+            	    <div class="ui-block-c" style="width:5%">
+            		<img style="height:50px" src="dqd/static/NOAA_logo.svg"></img>
         	    </div>
-        	    <h1 class="ui-block-d" style="text-align:center;width:70%;margin-top:2%;margin-bottom:2%">Data Quality Dashboard</h1>
+        	    <h2 class="ui-block-d" style="text-align:center;width:70%;margin-top:0.5%">Data Quality Dashboard</h2>
         	</div>
                 <a href="#nav-panel" class="ui-btn-right ui-btn-a ui-btn ui-btn-inline ui-btn-icon-right ui-icon-bars ui-shadow">Menu</a>
-                <div data-role="navbar" data-iconpos="right">
-                    <ul>
-                        <li><a href="http://swewww/asp_view" rel="external" target="_blank" data-icon="action">ASP Viewer</a></li>
-            	        <li><a href="#asp-view" data-icon="bullets">ASP Viewer Beta</a></li>
-        	    </ul>
-   	        </div><!-- /navbar -->
        	    </div><!-- /header --> 
 
             <div role="main" class="ui-content">
@@ -139,7 +145,9 @@
 		<h3 align="center" id="noData"></h3>
                 <div class="ui-body ui-body-a">
 		    <h3 id="statsFound" style="text-align:center;margin:0px">Total ZDR Stats Processed:N/A</h3>
-		    <div id="main-gauge" style="height:480px; width:640px; margin:auto;"></div>
+		    <a href="#fullchart-page">
+		        <div id="main-gauge" style="height:480px; width:640px; margin:auto;"></div>
+		    </a>
 		    <div class="ui-grid-b">
 	                    <div id="rain-gauge" class="ui-block-a ui-input-btn ui-btn ui-shadow">
 	                        <input name="rain" type="button" data-enhanced="true" value="">
@@ -163,6 +171,9 @@
                 <ul data-role="listview">
                     <li data-role="list-divider">
                         ZDR Bias
+                    </li>
+                    <li>
+                        <a href="#fullchart-page">3-Panel Overview</a>
                     </li>
                     <li>
                         <a class="chart-page" name="rain" href="#rain-page">Rain method</a>
@@ -193,12 +204,12 @@
             </div>
             <div id="${name}-main" role="main" class="ui-content">
                 <h2 class="sites" align="center"></h2><h4 align="center">7 Day Running Median Shading/Daily Median Points</h4>
-		<form class="redundant" style="visibility:hidden" id="${name}-redundant">	
-            	    <fieldset data-role="controlgroup" data-mini="true" id="toggle">
+		<form class="redundant" style="visibility:hidden">	
+            	    <fieldset data-role="controlgroup" data-mini="true">
                         <legend>RDA Channel:</legend>
-                	<input name="channel-toggle" id="${name}Chan1" value="Chan1" class="${name}Toggle" type="checkbox">
+                	<input name="channel-toggle" id="${name}Chan1" value="Chan1" class="${name}" type="checkbox">
                 	<label for="${name}Chan1">One</label>
-                	<input name="channel-toggle" id="${name}Chan2" value="Chan2" class="${name}Toggle" type="checkbox">
+                	<input name="channel-toggle" id="${name}Chan2" value="Chan2" class="${name}" type="checkbox">
                 	<label for="${name}Chan2">Two</label>
                     </fieldset>
 		</form>
@@ -209,7 +220,62 @@
             </div>
         </div>
         % endfor
+        <div id="fullchart-page" data-role="page">
+            <div id="fullchart-nav-panel" data-role="panel" data-position="right" data-display="overlay">
+                <ul data-role="listview">
+                    <li data-role="list-divider">
+                        ZDR Bias
+                    </li>
+                    <li>
+                        <a href="#fullchart-page">3-Panel Overview</a>
+                    </li>
+                    <li>
+                        <a name="rain" href="#rain-page">Rain method</a>
+                    </li>
+                    <li>
+                        <a name="snow" href="#snow-page">Snow method</a>
+                    </li>
+                    <li>
+                        <a name="bragg" href="#bragg-page">Bragg method</a>
+                    </li>
+                </ul>
+            </div>
 
+            <div data-role="header">
+                <h2>ZDR Bias - All Methods</h2>
+                <a href="#fullchart-nav-panel" class="ui-btn-right ui-btn ui-btn-inline ui-btn-icon-right ui-icon-bars ui-shadow">Menu</a>
+                <a href="#dqd-page" class="home ui-btn-left ui-btn ui-btn-inline ui-btn-icon-left ui-icon-home ui-shadow">Home</a>
+            </div>
+            <div id="fullchart-main" role="main" class="ui-content">
+                <div style="text-align:center">
+                    <h2 style="display:inline-block;margin:0px;" class="sites"></h2><h4 style="display:inline-block;margin:0px;">&nbsp 7 Day Running Median Shading/Daily Median Points</h4>
+                </div>
+                <form style="position:absolute" class="redundant">
+                    <fieldset data-role="controlgroup" data-mini="true">
+                        <legend>RDA Channel:</legend>
+                        <input name="channel-toggle" value="Chan1" id="fullchartChan1" class="fullchart" type="checkbox">
+                        <label for="fullchartChan1">Channel 1</label>
+                        <input name="channel-toggle" value="Chan2" id="fullchartChan2" class="fullchart" type="checkbox">
+                        <label for="fullchartChan2">Channel 2</label>
+                    </fieldset>
+                </form>
+                <h2 style="position:absolute;top:200px;margin:0px;">Rain -</h2>
+                <h2 style="position:absolute;top:440px;margin:0px;">Snow -</h2>
+                <h2 style="position:absolute;top:680px;margin:0px;">Bragg -</h2>
+                <a href="#rain-page">
+                    <div id="rain-fullcontainer"></div>
+                </a>
+                <a href="#snow-page">
+                    <div id="snow-fullcontainer"></div>
+                </a>
+                <a href="#bragg-page">
+                    <div id="bragg-fullcontainer"></div>
+                </a>
+            </div>
+            <div data-role="footer">
+                <h3>NEXRAD Radar Operations Center</h3>
+            </div>
+        </div>
         <div id="issue-page" data-role="page">
             <div id="issue-nav-panel" data-role="panel" data-position="right" data-display="overlay">
                 <ul data-role="listview">

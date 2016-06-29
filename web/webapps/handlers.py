@@ -138,15 +138,15 @@ def parse_date_time(zdr_date_time_str):
 def parse_zdr_stats(zdr_split):
     if len(zdr_split) != 2:
         return None
+    if 'RDA' in zdr_split[1]:
+        redundant = re.findall('RDA:(.*?)]', zdr_split[1])[0]
+        take_from = zdr_split[1][(zdr_split[1].index(']') + 2):].rstrip('\0')
+    else:
+        take_from = zdr_split[1][(zdr_split[1].index(':') + 1):].rstrip('\0')
+        redundant = 1
+    stat_date_time = parse_date_time(zdr_split[0])
 
     if '(Bragg)' in zdr_split[1]:
-	if 'RDA' in zdr_split[1]:
-	    redundant = re.findall('RDA:(.*?)]', zdr_split[1])[0]
-	    take_from = zdr_split[1][(zdr_split[1].index(']') + 2):].rstrip('\0')
-	else: 
-	    take_from = zdr_split[1][(zdr_split[1].index(':') + 1):].rstrip('\0')
-	    redundant = 1
-	stat_date_time = parse_date_time(zdr_split[0])
         if 'Unavailable' in zdr_split[1] or 'Last detection' in zdr_split[1]:
             return {'redundant':redundant,'time':time.mktime(stat_date_time.timetuple())}
         else:
@@ -165,9 +165,8 @@ def parse_zdr_stats(zdr_split):
 	    else: 
                 return None
     else:
-        take_from = zdr_split[1][(zdr_split[1].index(':') + 1):].rstrip('\0')
+        #take_from = zdr_split[1][(zdr_split[1].index(':') + 1):].rstrip('\0')
         (rain_raw, dry_snow_raw,) = take_from.split('DS')
-        stat_date_time = parse_date_time(zdr_split[0])
         rain_raw = rain_raw.split(',')
         (zdr_error_rain, first_zdr_refl_cat,) = rain_raw[0].split('/')
         (last_zdr_refl_cat, total_num_rain_bins, first_std_dev,) = rain_raw[5].split('/')
