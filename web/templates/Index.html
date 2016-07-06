@@ -203,17 +203,20 @@
 		<a href="#dqd-page" class="ui-btn-left ui-btn ui-btn-inline ui-btn-icon-left ui-icon-home ui-shadow">Home</a>
             </div>
             <div id="${name}-main" role="main" class="ui-content">
-                <h2 class="sites" align="center"></h2><h4 align="center">7 Day Running Median Shading/Daily Median Points</h4>
-		<form class="redundant" style="visibility:hidden">	
+                <h2 style="margin:0px" class="sites" align="center"></h2><h4 style="margin-bottom:0px;margin-top:10px" align="center">7 Day Running Median Shading/Daily Median Points</h4>
+		<form class="redundant" style="visibility:hidden; position:absolute">	
             	    <fieldset data-role="controlgroup" data-mini="true">
                         <legend>RDA Channel:</legend>
                 	<input name="channel-toggle" id="${name}Chan1" value="Chan1" class="${name}" type="checkbox">
-                	<label for="${name}Chan1">One</label>
+                	<label for="${name}Chan1">Channel 1</label>
                 	<input name="channel-toggle" id="${name}Chan2" value="Chan2" class="${name}" type="checkbox">
-                	<label for="${name}Chan2">Two</label>
+                	<label for="${name}Chan2">Channel 2</label>
                     </fieldset>
 		</form>
 		<div id="${name}-container"></div>
+		<div align="center">	
+                    <a class="ui-btn ui-btn-inline ui-shadow" href="#fullchart-page">Return to 3-Panel Overview</a>
+		</div>
             </div>
             <div data-role="footer">
                 <h3>NEXRAD Radar Operations Center - INTERNAL USE ONLY</h3>

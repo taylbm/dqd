@@ -4,7 +4,7 @@ var messageStore = {};
 var mimeType = "text/plain";
 var logInfo = "N/A"
 
-function loadData(loadString) 
+function loadData(loadString,stripGenInfo) 
 {
     $('input[name="logFilter"]').each(function(idx,element) {
         $(element).prop('checked',true).checkboxradio('refresh')
@@ -17,13 +17,58 @@ function loadData(loadString)
 	messageStore = data;
         for (var m = 0 ; m < data.length - 1; m++) {
 	    var classString = data[m][0]
-	    $('#logTable').find('tbody').append($('<tr>').text(data[m][1]).attr('class',classString))
+	    if (stripGenInfo) {
+	        if (classString != "RPG_GEN_STATUS" && classString != "RPG_INFO")
+	    	    $('#logTable').find('tbody').append($('<tr>').text(data[m][1]).attr('class',classString))
+	    }
+	    else {
+		$('#logTable').find('tbody').append($('<tr>').text(data[m][1]).attr('class',classString))
+	    }
         }
         $('.ui-loader').css('display','none')
     })
     .error(function (jqXHR, textStatus, errorThrown) {
         alert('Internal Server Error :(' )
     })
+}
+function dateSelect(type) { 
+    var rangeBool = Boolean(parseInt($('input[name="rangeToggle"]:checked').val()))
+    if (rangeBool) {
+	var min = $('#datep').data().datepicker.minRange
+	var max = $('#datep').data().datepicker.maxRange
+	if (Boolean(min) && Boolean(max)) {
+	    var minDay = min.getUTCDate()
+	    var minMonth = min.getUTCMonth() + 1
+	    var minYear = min.getUTCFullYear()
+	    var maxDay = max.getUTCDate()
+	    var maxMonth = max.getUTCMonth() + 1
+	    var maxYear = max.getUTCFullYear()
+	    if (!ICAO)
+		alert("Select an ICAO first")
+	    else
+		loadData(ICAO + "_" + minYear + "-" + minMonth + "-" + minDay + "_" + maxYear + "-" + maxMonth + "-" + maxDay, type)
+	}
+	else {
+	    if (!Boolean(min) )
+		alert("Invalid end date selection")
+	    else if (!Boolean(max)) 
+		alert("Invalid start date selection")
+	}
+    }
+    else {  
+	var selectedDate = $('#datep').data().datepicker.selectedDates[0]
+	if (Boolean(selectedDate)) {
+	    var Day = selectedDate.getUTCDate()
+	    var Month = selectedDate.getUTCMonth() + 1
+	    var Year = selectedDate.getUTCFullYear()
+	    if (!ICAO) 
+		alert("Select an ICAO first")
+	    else 
+		loadData(ICAO + "_" + Year + "-" + Month + "-" + Day + "_" + Year + "-" + Month + "-" + Day, type)
+	}
+	else
+	    alert("Invalid date selection")
+    }
 }
     
     $(document).ready(function() {
@@ -67,46 +112,9 @@ function loadData(loadString)
 	    var calendar = $('#datep').datepicker().data('datepicker')
 	    calendar.clear()
 	    calendar.update({range:rangeBool})
-	});	
-	    	
-	$('#submitDate').click(function() {
-	    var rangeBool = Boolean(parseInt($('input[name="rangeToggle"]:checked').val()))
-	    if (rangeBool) {
-  	        var min = $('#datep').data().datepicker.minRange	
-	        var max = $('#datep').data().datepicker.maxRange
-	        if (Boolean(min) && Boolean(max)) {
-	 	    var minDay = min.getUTCDate()
-	 	    var minMonth = min.getUTCMonth() + 1
-		    var minYear = min.getUTCFullYear()
-	            var maxDay = max.getUTCDate()
-		    var maxMonth = max.getUTCMonth() + 1
-		    var maxYear = max.getUTCFullYear()
-		    if (!ICAO)
-		        alert("Select an ICAO first")
-		    else 
-		        loadData(ICAO + "_" + minYear + "-" + minMonth + "-" + minDay + "_" + maxYear + "-" + maxMonth + "-" + maxDay)
-	        }
-	        else {	
-		    if (!Boolean(min) ) 
-		        alert("Invalid end date selection")
-		    else if (!Boolean(max)) 
-		        alert("Invalid start date selection")
-	        }
-	    }
-	    else { 
-		var selectedDate = $('#datep').data().datepicker.selectedDates[0]
-		if (Boolean(selectedDate)) {
-                    var Day = selectedDate.getUTCDate()
-                    var Month = selectedDate.getUTCMonth() + 1
-                    var Year = selectedDate.getUTCFullYear()
-		    if (!ICAO) 
-		 	alert("Select an ICAO first")
-		    else 
-			loadData(ICAO + "_" + Year + "-" + Month + "-" + Day + "_" + Year + "-" + Month + "-" + Day)
-		}
-		else
-		    alert("Invalid date selection")
-	    }
+	});	    	
+	$('#submit-button').click(function() {
+	    dateSelect($('#fastQ').is(":checked"))
 	});
 	$('input[name="logFilter"]').click(function() { 
 	    var display = $(this).prop('checked') ? '' : 'none'

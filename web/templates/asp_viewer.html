@@ -132,19 +132,26 @@
 		    <label for="Day">Day</label>
                 </fieldset>
             </form>
-            <div class="ui-block-c" style="width:">
-                <a href="#" id="submitDate" class="ui-shadow ui-btn ui-corner-all ui-btn-icon-left ui-icon-check" >Submit</a>
-            </div>
+	    <form class="ui-block-c" style="width:15%">
+    		<input name="fastQ" id="fastQ" type="checkbox">
+    	        <label for="fastQ">Fast Query</label>
+	    </form>
             <div style="width:" class="ui-block-d">
-                <a href="#popupMenu" data-rel="popup" class="ui-btn ui-corner-all ui-shadow ui-icon-gear ui-btn-icon-left ui-btn-a">Message Filter</a> 
-    	    </div>
-	    <div style="width:" class="ui-block-e">
 	        <a id="selectICAObutton" href="#selectICAO" data-rel="popup" class="ui-btn ui-corner-all ui-shadow ui-icon-location ui-btn-icon-left ui-btn-a">Select Site</a>
 	    </div>
+            <div class="ui-block-e" style="width:25%">
+                <a id="submit-button" class="ui-shadow ui-btn ui-corner-all ui-btn-icon-left ui-icon-check" >Submit</a>
+            </div>
 	</div>
-        <form>
-            <input id="filterTable-input" data-type="search">
-        </form>
+	<div class="ui-grid-a">
+	    <form class="ui-block-a">
+	        <input id="filterTable-input" data-type="search">
+	    </form>
+	    <div class="ui-block-b">
+                <a href="#popupMenu" data-rel="popup" class="ui-btn ui-corner-all ui-shadow ui-icon-gear ui-btn-icon-left ui-btn-a">Message Filter</a> 
+	    </div>
+	</div>
+		
         <table data-role="table" data-filter="true" data-input="#filterTable-input" class="ui-responsive" id="logTable">
             <tbody id="logBody">
 	    <tr></tr>

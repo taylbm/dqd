@@ -29,6 +29,8 @@ var weights = [0.25,0.33,0.42], // Weights for Rain, Snow, & Bragg methods, resp
     monthNum = (now.getMonth() + 1).toString(),
     DQDICAO = 'KTLX',
     firstLoad = true,
+    prevPage = "dqd",
+    channel = ["Chan1"],
     MainGage = null, RainGage = null, SnowGage = null, BraggGage = null
 ;
 
@@ -51,34 +53,16 @@ function Interval()
         now.setUTCHours(23,59,59,999);
     }
     var sevenDays = new Date(now.getTime() - 7 * 24 * 3600 * 1e3);
-    var month = new Date(now.getTime());
-    month.setUTCMonth(now.getUTCMonth(), 0)
+    var month = new Date(now.getTime() - 365/12 * 24 * 3600 * 1e3);
     then.setTime(now.getTime() - 182.5 * 24 * 3600 * 1e3);
     var interval = {
                         'sevenDays':sevenDays/1000,
-                        'oneMonth':month.getTime()/1000,
+                        'oneMonth':month/1000,
                         'sixMonths':then/1000
     };
     return interval
 }
 
-
-function recalcInterval(year,monthNum)
-{
-    now.setUTCFullYear(year,monthNum,0);
-    now.setUTCHours(23,59,59,999);
-    then.setTime(now.getTime() - 182.5 * 24 * 3600 * 1e3);
-    var sevenDaysNew = new Date(now.getTime() - 7 * 24 * 3600 * 1e3);
-    var monthNew = new Date(now.getTime());
-    monthNew.setUTCMonth(now.getUTCMonth(), 0)
-    var thenNew = new Date(now.getTime() - 182.5 * 24 * 3600 * 1e3);
-    var interval = {
-	    		'7Days':sevenDaysNew/1000,
-	    		'1Month':monthNew.getTime()/1000,
-	    		'6Months':thenNew/1000
-    };
-    return interval
-}
 function mean(arr)
 {
     var i,
@@ -136,7 +120,7 @@ function setSizesFull(plotAdd) {
     ;
 
 
-     var rainContain = $('#rain-fullcontainer');
+    var rainContain = $('#rain-fullcontainer');
     var snowContain = $('#snow-fullcontainer');
     var braggContain = $('#bragg-fullcontainer');
     var chartWidth = $('#fullchart-main').width() * 0.8;
@@ -212,7 +196,6 @@ function setSizesFull(plotAdd) {
     var plotOptsMulti = { "medianRain":[].concat(plotOpts),"medianSnow":[].concat(plotOpts),"medianBragg":[].concat(plotOpts) }
     $.each(plotOptsMulti,function (idx,obj) {
     if (redundantBool){
-	console.log(plotAdd)
         for (var p = 0; p < plotAdd.length; p++){
             obj.push(
                 {
@@ -295,7 +278,6 @@ function setSizesFull(plotAdd) {
         );
     }
     });
-    console.log(plotOptsMulti)
     var containers = ["rain","snow","bragg"]
     $.each(containers, function(idx,name) {
     var nameU = 'median' + name.charAt(0).toUpperCase() + name.slice(1);
@@ -339,7 +321,7 @@ function setSizes(pageName, plotAdd)
         
     if (chartContainer.length < 1)
         return;
-    chartContainer.height('400').width($(document).width() * 0.8).css('margin', 'auto');
+    chartContainer.height('400').width($('#' + pageMainName).width() * 0.8).css('margin', 'auto');
     
     var belowDataToPlot = [],
         aboveDataToPlot = [],
@@ -348,15 +330,15 @@ function setSizes(pageName, plotAdd)
     ;
     var methodName = 'median' + method[0].toUpperCase() + method.slice(1) 
     if(redundantBool){
-        var redundantChart = {"Chan1" : {'belowDataToPlot':[],'aboveDataToPlot':[],'dailyPoints':[]},
-                              "Chan2": {'belowDataToPlot':[],'aboveDataToPlot':[],'dailyPoints':[]}
+        var redundantChart = {"Chan1" : {'belowDataToPlot':[],'aboveDataToPlot':[],'dailyPoints':[],'overTolerance':[]},
+                              "Chan2": {'belowDataToPlot':[],'aboveDataToPlot':[],'dailyPoints':[],'overTolerance':[]}
         }
         ;
 	$.each(SummaryData, function (idx, obj) {
                 var channel = 'Chan' + obj.redundantMode
                 redundantChart[channel]['belowDataToPlot'].push([obj.time * 1e3, obj[methodName] < 0 ? obj[methodName] : null]);
                 redundantChart[channel]['aboveDataToPlot'].push([obj.time * 1e3, obj[methodName] >= 0 ? obj[methodName] : null]);
-                overTolerance.push([obj.time * 1e3, -0.50 > obj[methodName] || obj[methodName] > 0.50 ? 0.50 : null]);
+                redundantChart[channel]['overTolerance'].push([obj.time * 1e3, -0.50 > obj[methodName] || obj[methodName] > 0.50 ? 0.50 : null]);
 		summaryToolValues[obj.time * 1e3] = [obj[methodName],channel];
         });
         $.each(DailyData, function(idx, obj) {
@@ -428,7 +410,16 @@ function setSizes(pageName, plotAdd)
                 }
             }
         );
-
+        plotOpts.push(
+            {
+                data: redundantChart[plotAdd[p]]['overTolerance'],
+                color: 'black',
+                points: {
+                    show: true,
+                    symbol: "square",
+                }
+            }
+        );
     	}
     }
     else{
@@ -468,18 +459,17 @@ function setSizes(pageName, plotAdd)
                 }
             }
         );
-
+        plotOpts.push(
+            {
+                data: overTolerance,
+                color: 'black',
+                points: {
+                    show: true,
+                    symbol: "square",
+                }
+            }
+        );
     }
-    plotOpts.push(
-	{
-	    data: overTolerance,
-	    color: 'black',
-	    points: {
-		show: true,
-		symbol: "square",
-	    }
-	}
-    );
     $.plot(
         chartContainer,plotOpts, 
         {
@@ -520,7 +510,7 @@ function determineOverview(chan,initialData)
 	mRain = []
     ;
     var time = $('#time-form :checked').val()
-    var timeInterval = Interval()
+    var timeInterval = Interval()	
     if(redundantBool){
 	rBragg = {'Chan1':[],'Chan2':[]};
         rSnow = {'Chan1':[],'Chan2':[]};
@@ -704,21 +694,29 @@ $(document).ready(function () {
 	            clicksYet = false,
 	      	    previousPoint = null
 	        ;
-	        if ( !$.isEmptyObject(storeData) ) {
-		    var channel = $('#channel-form :checked').val()
+	        if ( !$.isEmptyObject(storeData) ) { 
+		    if (prevPage != "dqd") {  
+                        selectedChannels = $('input[type="checkbox"]').filter('.' + prevPage).map(function(){
+                            if ( $(this).is(':checked') )
+                       		return String($(this).val());
+            		});
+		        channel = $.makeArray(selectedChannels)
+		    }
 		    if ( storeData['redundantBool'] ) { 
                         $('.'+page).prop('checked',false).checkboxradio('refresh');
-                        $('#' + page + channel).prop('checked',true).checkboxradio('refresh');
+			console.log(channel)
+			for ( c in channel)
+                            $('#' + page + channel[c]).prop('checked',true).checkboxradio('refresh');
                         if (page == "fullchart") 
-                            setSizesFull([channel]) 
+                            setSizesFull(channel) 
                         else 
-                            setSizes(pageName, [channel])
+                            setSizes(pageName, channel)
 		    }
 		    else {
 			if (page == "fullchart")
-			    setSizesFull([channel])
+			    setSizesFull(channel)
 			else  
-			    setSizes(pageName, [channel])
+			    setSizes(pageName, channel)
 		    }
 		}	
 		$("#"+page+"-container").bind("plothover",function(event, pos, item) {
@@ -751,14 +749,15 @@ $(document).ready(function () {
 		    } 	
 		});
 	    }
+	    prevPage = page;
 	});
 
 	$('input[name="channel-toggle"]').on("click", function(e) {
 	    var name = $(this).attr("id").slice(0,-5)
             selectedChannels = $('input[type="checkbox"]').filter('.' + name).map(function(){
                 if ( $(this).is(':checked') )
-                    return $(this).val();
-            });
+                    return String($(this).val());
+            })
 	    if (name == "fullchart")
 	        setSizesFull(selectedChannels)
 	    else
@@ -775,7 +774,7 @@ $(document).ready(function () {
 	    $('#selectDQDICAO').popup('close');
 	    loadDQDData();
 	});
-	$('#latestVolume').prop('checked',true).click();
+	$('#oneMonth').prop('checked',true).click();
 	$('#overviewChan1').prop('checked',true).click();
 	
 	$('input[name="time-select"]').on('click',function(){
@@ -783,8 +782,9 @@ $(document).ready(function () {
 	    determineOverview(channel,false);
 	});
 	$('input[name="overview-channel-select"]').on('click',function(){
-	    var channel  = $(this).attr('value');
-	    determineOverview(channel,false);
+	    var channelTemp  = $(this).attr('value');
+	    channel = [channelTemp]
+	    determineOverview(channelTemp,false);
 	});
 	$('input[type="button"]').on('click',function() {
 	    var name = $(this).attr('name');

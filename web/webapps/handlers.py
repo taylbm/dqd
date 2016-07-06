@@ -81,7 +81,7 @@ def getFileNames(date):
 	start_month_first = [ fn for fn in start_month_list if start_day - 1 == int(fn.split('_')[2])  and int(fn.split('_')[3]) == 22 ]
         end_month_fnames = [ fn for fn in os.listdir(os.path.join(ASP_dir, ICAO, end_year, '%02d' % end_month)) if end_day >= int(fn.split('_')[2]) ]
         end_month_fnames.sort()
-	fnames = start_month_first + start_month_fnames
+	fnames = start_month_first + start_month_fnames + end_month_fnames
     else:
 	month_first = [fn for fn in start_month_list if start_day - 1 == int(fn.split('_')[2]) and int(fn.split('_')[3]) == 22]
         month_list = [ fn for fn in start_month_list if end_day >= int(fn.split('_')[2]) >= start_day ]
@@ -92,7 +92,7 @@ def getFileNames(date):
 def sse_pack_single(d):
     buffer = ''
     for k in ['retry',
-     'id',
+    'id',
      'data',
      'event']:
         if k in d.keys():
