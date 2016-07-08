@@ -28,7 +28,7 @@ HERE = os.path.split(os.path.abspath(__file__))[0]
 PARENT = os.path.split(HERE)[0]
 os.environ["PATH"] += os.pathsep + os.path.join(os.path.split(PARENT)[0],"bin") # sets path for apache
 
-config_file = os.path.join(PARENT,'dqd.conf') 
+config_file = os.path.join(PARENT,'dqd.cfg') 
 
 f = open(config_file, 'r')
 

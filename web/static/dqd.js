@@ -276,6 +276,16 @@ function setSizesFull(plotAdd) {
                 }
             }
         );
+        obj.push(
+            {
+                data:fullDataSeries["overTolerance"][idx],
+                color:'black',
+                points: {
+                    show: true,
+                    symbol: "square",
+                }
+            }
+        );
     }
     });
     var containers = ["rain","snow","bragg"]
@@ -669,6 +679,8 @@ function loadDQDData()
 		data['DailyData'][idx].medianBragg = obj.medianBragg > -99.0 ? obj.medianBragg : null;
 	    });
             determineOverview('Chan1',data)
+	    $('#overviewChan1').prop('checked',true)	
+	    $('input[name="overview-channel-select"]').checkboxradio('refresh');
 	    $('#statsFound').html('Total ZDR Stats Processed: ' + data['statsFound'].toString())
 	    $('#endStamp').html('6 Month Period Ending: ' + now.getUTCDate() + ' ' + numberToMonth[(now.getUTCMonth() + 1).toString()] + ' ' + now.getUTCFullYear())
 	}
