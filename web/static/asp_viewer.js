@@ -99,13 +99,12 @@ function dateSelect(type) {
 
 	$('#datep').datepicker({
 	    todayButton:true,
+            autoClose: true,
 	    minDate: new Date(2008, 12, 1),
 	    maxDate: new Date()
 	});
-        $('.ICAO').on('click', function () {
-            ICAO = $(this).attr("id");
-            $('#selectICAO').popup('close');
-	    $('#selectICAObutton').html(ICAO);
+        $('select[name="selectICAO"]').on('change', function () {
+	    ICAO = $(this).val();
         });
 	$('input[name="rangeToggle"]').on("click", function() { 
 	    var rangeBool = Boolean(parseInt($(this).val()))

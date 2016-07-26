@@ -110,16 +110,6 @@
 		<label for="SELECT_ALL">Select All/None</label>
             </form>
         </div>
-        <div data-role="popup" data-position-to="origin" style="max-height:600px;overflow-y:scroll" id="selectICAO" data-theme="b">
-            <form class="ui-filterable">
-                <input id="filterICAO" data-type="search">
-            </form>
-            <ul data-role="listview" data-filter="true" data-input="#filterICAO">
-            % for site in context.get("ICAO_list"):
-               <li><a class="ICAO" id="${site}" href="#">${site}</a></li>
-            % endfor
-            </ul>
-        </div>
 	<div class="ui-grid-d">
             <div style="margin-right:1%;"class="ui-block-a" id="date-picker-contain">
                 <input id="datep" data-range="true" type="text" data-language="en" class="datepicker-here" data-position="right top" align="center"></input>
@@ -137,7 +127,11 @@
     	        <label for="fastQ">Fast Query</label>
 	    </form>
             <div style="width:" class="ui-block-d">
-	        <a id="selectICAObutton" href="#selectICAO" data-rel="popup" class="ui-btn ui-corner-all ui-shadow ui-icon-location ui-btn-icon-left ui-btn-a">Select Site</a>
+                <select name="selectICAO" id="selectICAO">
+                % for site in context.get("ICAO_list"):
+                   <option class="ICAO" value="${site}" href="#">${site}</option>
+                % endfor
+                </select>
 	    </div>
             <div class="ui-block-e" style="width:25%">
                 <a id="submit-button" class="ui-shadow ui-btn ui-corner-all ui-btn-icon-left ui-icon-check" >Submit</a>
@@ -145,10 +139,10 @@
 	</div>
 	<div class="ui-grid-a">
 	    <form class="ui-block-a">
-	        <input id="filterTable-input" data-type="search">
+	        <input id="filterTable-input" data-mini="true" data-type="search">
 	    </form>
 	    <div class="ui-block-b">
-                <a href="#popupMenu" data-rel="popup" class="ui-btn ui-corner-all ui-shadow ui-icon-gear ui-btn-icon-left ui-btn-a">Message Filter</a> 
+                <a href="#popupMenu" data-rel="popup" class="ui-mini ui-btn ui-corner-all ui-shadow ui-icon-gear ui-btn-icon-left ui-btn-a">Message Filter</a> 
 	    </div>
 	</div>
 		

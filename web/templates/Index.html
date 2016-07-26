@@ -93,17 +93,11 @@
                 </div>
 		<div class="ui-grid-b">
 		    <div class="ui-block-a" style="width:38%">
-                        <a href="#selectDQDICAO" data-rel="popup" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-gear ui-btn-icon-left ui-btn-a">Select Site</a>
-                        <div data-role="popup" data-overlay-theme="b" data-position-to="origin" style="max-height:600px;overflow-y:scroll" id="selectDQDICAO" data-theme="b">
-                            <form class="ui-filterable">
-                                <input id="filterDQDICAO" data-type="search">
-                            </form>
-                            <ul data-role="listview" data-filter="true" data-input="#filterDQDICAO">
+                        <select name="dqdICAO" data-inline="true">
                             % for site in context.get("ICAO_list"):
-                                <li><a class="DQDICAO" id="${site}" href="#">${site}</a></li>
+                                <option class="DQDICAO" id="${site}" href="#">${site}</option>
                             % endfor
-                            </ul>
-                        </div>
+                        </select>
 			<select name="selectYear" id="selectYear" data-inline="true">
 			% for year in context.get("Years"):
 			    % if int(year) > 2012:

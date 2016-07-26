@@ -781,9 +781,8 @@ $(document).ready(function () {
 	    loadDQDData();
 	});
 
-	$('.DQDICAO').on('click', function () {
-	    DQDICAO = $(this).attr("id");
-	    $('#selectDQDICAO').popup('close');
+	$('select[name="dqdICAO"]').on('change', function () {
+	    DQDICAO = $(this).val();
 	    loadDQDData();
 	});
 	$('#oneMonth').prop('checked',true).click();
