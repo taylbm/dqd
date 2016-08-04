@@ -1,5 +1,5 @@
 var loadPre = "dqd/aspwalk?d=";
-var ICAO = 'KTLX';
+var ICAO = 'KABR';
 var messageStore = {};
 var mimeType = "text/plain";
 var logInfo = "N/A"
