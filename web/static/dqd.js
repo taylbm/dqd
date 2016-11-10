@@ -27,7 +27,7 @@ var weights = [0.25,0.33,0.42], // Weights for Rain, Snow, & Bragg methods, resp
     storeData = {},
     year = now.getFullYear().toString(),
     monthNum = (now.getMonth() + 1).toString(),
-    DQDICAO = 'KTLX',
+    DQDICAO = 'KABR',
     firstLoad = true,
     prevPage = "dqd",
     channel = ["Chan1"],
@@ -699,7 +699,8 @@ function loadDQDData()
 
 $(document).ready(function () {
        	$( ":mobile-pagecontainer" ).on( "pagecontainershow", function() {
-	    var pageName = $(this)[0].baseURI.split('#')[1]
+            var pageValid = $(this)[0].baseURI.split('#')[1] 
+	    var pageName = pageValid == undefined ? "dqd-page":$(this)[0].baseURI.split('#')[1] 
 	    var page = pageName.replace('-page','')
 	    if ( ['rain-page','snow-page','bragg-page','fullchart-page'].indexOf(pageName) >= 0) {
 	        var pointClicked = false,
