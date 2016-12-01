@@ -27,7 +27,7 @@ var weights = [0.25,0.33,0.42], // Weights for Rain, Snow, & Bragg methods, resp
     storeData = {},
     year = now.getFullYear().toString(),
     monthNum = (now.getMonth() + 1).toString(),
-    DQDICAO = 'KABR',
+    DQDICAO = "KABR",
     firstLoad = true,
     prevPage = "dqd",
     channel = ["Chan1"],
@@ -745,6 +745,8 @@ function loadDQDData()
 
 
 $(document).ready(function () {
+        DQDICAO = $('select[name="dqdICAO"]').val()
+        $('#site').html(DQDICAO);
        	$( ":mobile-pagecontainer" ).on( "pagecontainershow", function() {
             var pageValid = $(this)[0].baseURI.split('#')[1] 
 	    var pageName = pageValid == undefined ? "dqd-page":$(this)[0].baseURI.split('#')[1] 
@@ -788,8 +790,7 @@ $(document).ready(function () {
 				y = item.datapoint[1],
 				l = item.datapoint.length
 			    ;
-                            console.log(l)
-			    var actualValues = l == 3 || item.seriesIndex == 5 ? summaryToolValues[x] : dailyToolValues[x]
+			    var actualValues = l == 3 || item.seriesIndex == 4 ? summaryToolValues[x] : dailyToolValues[x]
 			    var actual = actualValues[0]
 			    if (Math.abs(y) < 0.50)
 				var actual = y;
