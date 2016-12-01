@@ -146,8 +146,6 @@ function setSizesFull(plotAdd) {
                 if (name != "time" && name != "redundantMode") {
                     redundantChart[channel]["belowDataToPlot"][name].push([obj.time * 1e3, data < 0 ? data : null]);
                     redundantChart[channel]["aboveDataToPlot"][name].push([obj.time * 1e3, data >= 0 ? data : null]);
-                    redundantChart[channel]["overBounds"][name].push([obj.time * 1e3, data > 0.50 ? 0.50 : null]);
-                    redundantChart[channel]["underBounds"][name].push([obj.time * 1e3, -0.50 > data ? -0.50 : null]);
                 }
             });
         });
@@ -156,6 +154,8 @@ function setSizesFull(plotAdd) {
             $.each(obj, function(name,data) {
                 if (name != "time" && name != "redundantMode")
                     redundantChart[channel]["dailyPoints"][name].push([obj.time * 1e3, data]);
+                    redundantChart[channel]["overBounds"][name].push([obj.time * 1e3, data > 0.50 ? 0.50 : null]);
+                    redundantChart[channel]["underBounds"][name].push([obj.time * 1e3, -0.50 > data ? -0.50 : null]);
             });
         });
     }
@@ -165,15 +165,16 @@ function setSizesFull(plotAdd) {
                 if (name != "time" && name != "redundantMode") {
                     fullDataSeries["belowDataToPlot"][name].push([obj.time * 1e3, data < 0 ? data : null]);
                     fullDataSeries["aboveDataToPlot"][name].push([obj.time * 1e3, data >= 0 ? data : null]);
-                    fullDataSeries["overBounds"][name].push([obj.time * 1e3, data > 0.50 ? 0.50 : null]);
-                    fullDataSeries["underBounds"][name].push([obj.time * 1e3, -0.50 > data ? -0.50 : null]);
                 }
             });
         });
         $.each(DailyData, function(idx, obj) {
 	    $.each(obj, function(name,data) {
-                if (name != "time" && name != "redundantMode")
+                if (name != "time" && name != "redundantMode") {
                     fullDataSeries["dailyPoints"][name].push([obj.time * 1e3, data]);
+                    fullDataSeries["overBounds"][name].push([obj.time * 1e3, data > 0.50 ? 0.50 : null]);
+                    fullDataSeries["underBounds"][name].push([obj.time * 1e3, -0.50 > data ? -0.50 : null]);
+                }
 	    });
         });
     }
@@ -372,13 +373,13 @@ function setSizes(pageName, plotAdd)
                 var channel = 'Chan' + obj.redundantMode
                 redundantChart[channel]['belowDataToPlot'].push([obj.time * 1e3, obj[methodName] < 0 ? obj[methodName] : null]);
                 redundantChart[channel]['aboveDataToPlot'].push([obj.time * 1e3, obj[methodName] >= 0 ? obj[methodName] : null]);
-                redundantChart[channel]['overBounds'].push([obj.time * 1e3, obj[methodName] > 0.50 ? 0.50 : null]);
-                redundantChart[channel]['underBounds'].push([obj.time * 1e3, -0.50 > obj[methodName] ? -0.50 : null]);
 		summaryToolValues[obj.time * 1e3] = [obj[methodName],channel];
         });
         $.each(DailyData, function(idx, obj) {
             var channel = 'Chan' + obj.redundantMode
             redundantChart[channel]['dailyPoints'].push([obj.time * 1e3, obj[methodName]]);
+            redundantChart[channel]['overBounds'].push([obj.time * 1e3, obj[methodName] > 0.50 ? 0.50 : null]);
+            redundantChart[channel]['underBounds'].push([obj.time * 1e3, -0.50 > obj[methodName] ? -0.50 : null]);
 	    dailyToolValues[obj.time * 1e3] = [obj[methodName],channel];
         });
     }
@@ -386,12 +387,12 @@ function setSizes(pageName, plotAdd)
         $.each(SummaryData, function (idx, obj) {
                 belowDataToPlot.push([obj.time * 1e3, obj[methodName] < 0 ? obj[methodName] : null]);
                 aboveDataToPlot.push([obj.time * 1e3, obj[methodName] >= 0 ? obj[methodName] : null]);
-                overBounds.push([obj.time * 1e3, obj[methodName] > 0.50 ? 0.50 : null]);
-                underBounds.push([obj.time * 1e3, -0.50 > obj[methodName] ? -0.50 : null]);
 		summaryToolValues[obj.time * 1e3] = [obj[methodName],false];
         });
         $.each(DailyData, function(idx, obj) {
             dailyPoints.push([obj.time * 1e3, obj[methodName]]);
+            overBounds.push([obj.time * 1e3, obj[methodName] > 0.50 ? 0.50 : null]);
+            underBounds.push([obj.time * 1e3, -0.50 > obj[methodName] ? -0.50 : null]);
             dailyToolValues[obj.time * 1e3] = [obj[methodName],false];
         });
 
@@ -787,6 +788,7 @@ $(document).ready(function () {
 				y = item.datapoint[1],
 				l = item.datapoint.length
 			    ;
+                            console.log(l)
 			    var actualValues = l == 3 || item.seriesIndex == 5 ? summaryToolValues[x] : dailyToolValues[x]
 			    var actual = actualValues[0]
 			    if (Math.abs(y) < 0.50)
