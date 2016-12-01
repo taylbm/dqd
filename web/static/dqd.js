@@ -132,7 +132,8 @@ function setSizesFull(plotAdd) {
                             "belowDataToPlot" : {"medianRain":[],"medianSnow":[],"medianBragg":[]},
                             "aboveDataToPlot": {"medianRain":[],"medianSnow":[],"medianBragg":[]},
                             "dailyPoints": {"medianRain":[],"medianSnow":[],"medianBragg":[]},
-                            "overTolerance": {"medianRain":[],"medianSnow":[],"medianBragg":[]}
+                            "overBounds": {"medianRain":[],"medianSnow":[],"medianBragg":[]},
+                            "underBounds": {"medianRain":[],"medianSnow":[],"medianBragg":[]}
     };
     if(redundantBool){
         var redundantChart = {"Chan1" : JSON.parse(JSON.stringify(fullDataSeries)),
@@ -145,7 +146,8 @@ function setSizesFull(plotAdd) {
                 if (name != "time" && name != "redundantMode") {
                     redundantChart[channel]["belowDataToPlot"][name].push([obj.time * 1e3, data < 0 ? data : null]);
                     redundantChart[channel]["aboveDataToPlot"][name].push([obj.time * 1e3, data >= 0 ? data : null]);
-                    redundantChart[channel]["overTolerance"][name].push([obj.time * 1e3, -0.50 > data || data > 0.50 ? 0.50 : null]);
+                    redundantChart[channel]["overBounds"][name].push([obj.time * 1e3, data > 0.50 ? 0.50 : null]);
+                    redundantChart[channel]["underBounds"][name].push([obj.time * 1e3, -0.50 > data ? -0.50 : null]);
                 }
             });
         });
@@ -163,7 +165,8 @@ function setSizesFull(plotAdd) {
                 if (name != "time" && name != "redundantMode") {
                     fullDataSeries["belowDataToPlot"][name].push([obj.time * 1e3, data < 0 ? data : null]);
                     fullDataSeries["aboveDataToPlot"][name].push([obj.time * 1e3, data >= 0 ? data : null]);
-                    fullDataSeries["overTolerance"][name].push([obj.time * 1e3, -0.50 > data || data > 0.50 ? 0.50 : null]);
+                    fullDataSeries["overBounds"][name].push([obj.time * 1e3, data > 0.50 ? 0.50 : null]);
+                    fullDataSeries["underBounds"][name].push([obj.time * 1e3, -0.50 > data ? -0.50 : null]);
                 }
             });
         });
@@ -229,7 +232,17 @@ function setSizesFull(plotAdd) {
             );
             obj.push(
                 {
-                    data: redundantChart[plotAdd[p]]['overTolerance'][idx],
+                    data: redundantChart[plotAdd[p]]['overBounds'][idx],
+                    color: 'black',
+                    points: {
+                        show: true,
+                        symbol: "square",
+                    }
+                }
+            );
+            obj.push(
+                {
+                    data: redundantChart[plotAdd[p]]['underBounds'][idx],
                     color: 'black',
                     points: {
                         show: true,
@@ -278,7 +291,17 @@ function setSizesFull(plotAdd) {
         );
         obj.push(
             {
-                data:fullDataSeries["overTolerance"][idx],
+                data:fullDataSeries["overBounds"][idx],
+                color:'black',
+                points: {
+                    show: true,
+                    symbol: "square",
+                }
+            }
+        );
+        obj.push(
+            {
+                data:fullDataSeries["underBounds"][idx],
                 color:'black',
                 points: {
                     show: true,
@@ -336,19 +359,21 @@ function setSizes(pageName, plotAdd)
     var belowDataToPlot = [],
         aboveDataToPlot = [],
 	dailyPoints	= [],
-	overTolerance	= []
+	overBounds	= [],
+        underBounds     = []
     ;
     var methodName = 'median' + method[0].toUpperCase() + method.slice(1) 
     if(redundantBool){
-        var redundantChart = {"Chan1" : {'belowDataToPlot':[],'aboveDataToPlot':[],'dailyPoints':[],'overTolerance':[]},
-                              "Chan2": {'belowDataToPlot':[],'aboveDataToPlot':[],'dailyPoints':[],'overTolerance':[]}
+        var redundantChart = {"Chan1" : {'belowDataToPlot':[],'aboveDataToPlot':[],'dailyPoints':[],'overBounds':[],'underBounds':[]},
+                              "Chan2": {'belowDataToPlot':[],'aboveDataToPlot':[],'dailyPoints':[],'overBounds':[],'underBounds':[]}
         }
         ;
 	$.each(SummaryData, function (idx, obj) {
                 var channel = 'Chan' + obj.redundantMode
                 redundantChart[channel]['belowDataToPlot'].push([obj.time * 1e3, obj[methodName] < 0 ? obj[methodName] : null]);
                 redundantChart[channel]['aboveDataToPlot'].push([obj.time * 1e3, obj[methodName] >= 0 ? obj[methodName] : null]);
-                redundantChart[channel]['overTolerance'].push([obj.time * 1e3, -0.50 > obj[methodName] || obj[methodName] > 0.50 ? 0.50 : null]);
+                redundantChart[channel]['overBounds'].push([obj.time * 1e3, obj[methodName] > 0.50 ? 0.50 : null]);
+                redundantChart[channel]['underBounds'].push([obj.time * 1e3, -0.50 > obj[methodName] ? -0.50 : null]);
 		summaryToolValues[obj.time * 1e3] = [obj[methodName],channel];
         });
         $.each(DailyData, function(idx, obj) {
@@ -361,7 +386,8 @@ function setSizes(pageName, plotAdd)
         $.each(SummaryData, function (idx, obj) {
                 belowDataToPlot.push([obj.time * 1e3, obj[methodName] < 0 ? obj[methodName] : null]);
                 aboveDataToPlot.push([obj.time * 1e3, obj[methodName] >= 0 ? obj[methodName] : null]);
-                overTolerance.push([obj.time * 1e3, -0.50 > obj[methodName] || obj[methodName] > 0.50 ? 0.50 : null]);
+                overBounds.push([obj.time * 1e3, obj[methodName] > 0.50 ? 0.50 : null]);
+                underBounds.push([obj.time * 1e3, -0.50 > obj[methodName] ? -0.50 : null]);
 		summaryToolValues[obj.time * 1e3] = [obj[methodName],false];
         });
         $.each(DailyData, function(idx, obj) {
@@ -422,7 +448,17 @@ function setSizes(pageName, plotAdd)
         );
         plotOpts.push(
             {
-                data: redundantChart[plotAdd[p]]['overTolerance'],
+                data: redundantChart[plotAdd[p]]['overBounds'],
+                color: 'black',
+                points: {
+                    show: true,
+                    symbol: "square",
+                }
+            }
+        );
+        plotOpts.push(
+            {
+                data: redundantChart[plotAdd[p]]['underBounds'],
                 color: 'black',
                 points: {
                     show: true,
@@ -471,7 +507,17 @@ function setSizes(pageName, plotAdd)
         );
         plotOpts.push(
             {
-                data: overTolerance,
+                data: overBounds,
+                color: 'black',
+                points: {
+                    show: true,
+                    symbol: "square",
+                }
+            }
+        );
+        plotOpts.push(
+            {
+                data: underBounds,
                 color: 'black',
                 points: {
                     show: true,
