@@ -1,0 +1,175 @@
+###
+### asp_viewer.mako - this is the ASP_viewer template, nearly identical to the rpg_status sub-menu for the web hci
+###
+
+<%!
+    inherit_layout = True 
+    layout_name = "asp_viewer.mako" 
+    page_id = 'asp-view'
+    page_title = 'ASP View'
+    page_classes = ''
+%>
+
+###
+### namespaces
+###
+
+
+###
+### blocks
+###
+
+<%block name="extra_header_markup">
+
+
+</%block>
+
+###
+### body
+###
+
+<div id="asp-view" data-role="page">
+    <div id="nav-panel" data-role="panel" data-position="right" data-display="overlay">
+                <ul data-role="listview">
+                    <li data-role="list-divider">
+                        Data Quality Dashboard
+                    </li>
+                    <li>
+                        <a href="#dqd-page">DQD</a>
+                    </li>
+                    <li data-role="list-divider">
+                        Archived Status Products
+                    </li>
+                    <li>
+                        <a href="http://swewww/asp_view" rel="external" target="_blank" data-icon="action">ASP Viewer</a>
+                    </li>
+                    <li>
+                        <a href="#asp-view" data-icon="bullets">ASP Viewer Beta</a>
+                    </li>
+                    <li data-role="list-divider">
+                        Issues
+                    </li>
+                    <li>
+                        <a class="chart-page" name="issue" href="#issue-page">Submit Feedback</a>
+                    </li>
+                    <li>
+                        <a target="_blank" href="https://docs.google.com/a/noaa.gov/spreadsheets/d/1ITrfO_KmNXUFaJPJsPLrjgXr7n6xSAxL7hihkD2E4R8/edit?usp=sharing">View Feedback</a>
+                    </li>
+                </ul>
+    </div>
+    <div data-role="header" style="overflow:hidden;" data-theme="b">
+        <div class="ui-grid-c">
+            <div class="ui-block-a" style="width:5%">
+                <img style="height:50px" src="${Prefix}static/ROC_logo.png"></img>
+            </div>
+            <div class="ui-block-b" style="width:5%">
+                <img style="height:50px" src="${Prefix}static/NWS_logo.svg"></img>
+            </div>
+            <div class="ui-block-c" style="width:5%">
+                <img style="height:50px" src="${Prefix}static/NOAA_logo.svg"></img>
+            </div>
+           <h2 class="ui-block-d" style="text-align:center;width:70%;margin-top:0.5%;">Archived Status Product Viewer Beta</h2>
+        </div>
+        <a href="#nav-panel" class="ui-btn-right ui-btn-a ui-btn ui-btn-inline ui-btn-icon-right ui-icon-bars ui-shadow">Menu</a>
+    </div><!-- /header -->
+
+<div class="container" style="width:1300px;margin: 0 auto;">
+    <div class="ui-body ui-body-a ui-grid-a">
+        <div data-role="popup" id="popupMenu">
+            <form>
+            <fieldset data-role="controlgroup">
+                <h3 style="text-align:center">Select RPG Message</h3>
+                <input name="logFilter" id="RPG_INFO" checked="true" type="checkbox">
+                <label class="INFO" for="RPG_INFO">Informational</label>
+                <input name="logFilter" id="RPG_GEN_STATUS" checked="true" type="checkbox">
+                <label class="GEN" for="RPG_GEN_STATUS">General Status</label>
+                <input name="logFilter" id="NB_COMMS" checked="true" type="checkbox">
+                <label class="COMMS" for="NB_COMMS">Narrowband Communications</label>
+                <input name="logFilter" id="RPG_WARNINGS" checked="true" type="checkbox">
+                <label class="WARN" for="RPG_WARNINGS">Warnings/Error</label>
+                <h3 style="text-align:center">Select RPG Alarm</h3>
+                <input name="logFilter" id="RPG_LS_ALARM" checked="true" type="checkbox">
+                <label class="LS" for="RPG_LS_ALARM">Load Shed (LS)</label>
+                <input name="logFilter" id="RPG_MAR_ALARM" checked="true" type="checkbox">
+                <label class="MAR" for="RPG_MAR_ALARM">Maintenance Required (MR)</label>
+                <input name="logFilter" id="RPG_MAM_ALARM" checked="true" type="checkbox">
+                <label class="MAM" for="RPG_MAM_ALARM">Maintenance Mandatory (MM)</label>
+                <h3 style="text-align:center">Select RDA Alarm</h3>
+                <input name="logFilter" id="RDA_SECONDARY_ALARM" checked="true" type="checkbox">
+                <label class="SEC" for="RDA_SECONDARY_ALARM">Secondary (SEC)</label>
+                <input name="logFilter" id="RDA_MAR_ALARM" checked="true" type="checkbox">
+                <label class="MAR" for="RDA_MAR_ALARM">Maintenance Required (MR)</label>
+                <input name="logFilter" id="RDA_MAM_ALARM" checked="true" type="checkbox">
+                <label class="MAM" for="RDA_MAM_ALARM">Maintenance Mandatory (MM)</label>
+                <input name="logFilter" id="RDA_INOP_ALARM" checked="true" type="checkbox">
+                <label class="INOP" for="RDA_INOP_ALARM">Inoperable (INOP)</label>
+	    </fieldset>
+	    </form>
+	    <form>
+		<input id="SELECT_ALL" check="false" type="checkbox"/>
+		<label for="SELECT_ALL">Select All/None</label>
+            </form>
+        </div>
+	<div class="ui-grid-d">
+            <div style="margin-right:1%;"class="ui-block-a" id="date-picker-contain">
+                <input id="datep" data-range="true" type="text" data-language="en" class="datepicker-here" data-position="right top" align="center"></input>
+            </div>
+            <form class="ui-block-b" style="width:15%">
+	        <fieldset data-role="controlgroup" data-type="horizontal">
+                    <input name="rangeToggle" id="Range" value="1" checked="checked" type="radio"></input>
+		    <label for="Range">Range</label>
+                    <input name="rangeToggle" id="Day" value="0" type="radio"></input>
+		    <label for="Day">Day</label>
+                </fieldset>
+            </form>
+	    <form class="ui-block-c" style="width:15%">
+    		<input name="fastQ" id="fastQ" type="checkbox">
+    	        <label for="fastQ">Fast Query</label>
+	    </form>
+            <div style="width:" class="ui-block-d">
+                <select name="selectICAO" id="selectICAO">
+                % for site in context.get("ICAO_list"):
+                   <option class="ICAO" value="${site}" href="#">${site}</option>
+                % endfor
+                </select>
+	    </div>
+            <div class="ui-block-e" style="width:25%">
+                <a id="submit-button" class="ui-shadow ui-btn ui-corner-all ui-btn-icon-left ui-icon-check" >Submit</a>
+            </div>
+	</div>
+	<div class="ui-grid-a">
+	    <form class="ui-block-a">
+	        <input id="filterTable-input" data-mini="true" data-type="search">
+	    </form>
+	    <div class="ui-block-b">
+                <a href="#popupMenu" data-rel="popup" class="ui-mini ui-btn ui-corner-all ui-shadow ui-icon-gear ui-btn-icon-left ui-btn-a">Message Filter</a> 
+	    </div>
+	</div>
+		
+        <table data-role="table" data-filter="true" data-input="#filterTable-input" class="ui-responsive" id="logTable">
+            <tbody id="logBody">
+	    <tr></tr>
+            </tbody>
+        </table>
+        <div class="ui-grid-a">
+            <div style="width:" class="ui-block-a">
+                <a id="printPage" data-rel="popup" class="ui-btn ui-corner-all ui-shadow ui-icon-comment ui-btn-icon-left ui-btn-a">Print Page</a>
+            </div>
+            <div style="width:" class="ui-block-b">
+                <a id="downloadLog" class="ui-btn ui-corner-all ui-shadow ui-icon-arrow-d ui-btn-icon-left ui-btn-a">Download Log</a>
+            </div>
+        </div>
+	
+    </div>
+</div>
+<div data-role="footer">
+    <h4>NEXRAD Radar Operations Center - INTERNAL USE ONLY</h4>
+</div>
+
+</div>
+
+
+
+	
+
+

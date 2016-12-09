@@ -26,6 +26,7 @@ recipient = 'Brandon.M.Taylor@noaa.gov'
 
 HERE = os.path.split(os.path.abspath(__file__))[0]
 PARENT = os.path.split(HERE)[0]
+ROOT = os.path.split(PARENT)[0]
 os.environ["PATH"] += os.pathsep + os.path.join(os.path.split(PARENT)[0],"bin") # sets path for apache
 
 config_file = os.path.join(PARENT,'dqd.cfg') 
@@ -185,7 +186,7 @@ def parse_zdr_stats(zdr_split):
 def dqdwalk(rand_dirname):
     zdr_stats_raw = []
     zdr_stats_split = []
-    dump = Popen(['standalone_dsp -w -D ' + rand_dirname + ' -g "ZDR Stats"'], shell=True, stdout=PIPE, stderr=PIPE)
+    dump = Popen([ROOT + '/bin/standalone_dsp -w -D ' + rand_dirname + ' -g "ZDR Stats"'], shell=True, stdout=PIPE, stderr=PIPE)
     print '--> retrieving output'
     out = dump.communicate()
     shutil.rmtree(rand_dirname)
@@ -271,9 +272,11 @@ def dqdwalk(rand_dirname):
 
 class IndexView(object):
     def GET(self):
+        url_prefix = web.ctx.env.get("SCRIPT_NAME")
         return LOOKUP.Index(**{'ICAO_list': ICAO_list,
          'Years': getYears(),
-         'M2N': config["MonthToNumber"]})
+         'M2N': config["MonthToNumber"],
+         'Prefix': url_prefix})
 
 
 class Button(object):
@@ -281,19 +284,6 @@ class Button(object):
         selected_button = web.input(id=None)
         if selected_button.id not in getoutput('ps -A'):
             return Popen(selected_button.id).wait()
-
-
-class DQD(object):
-    def GET(self):
-        raise web.seeother('/static/index.html')
-
-
-class ASPview(object):
-    def GET(self):
-        return LOOKUP.Index(**{'ICAO_list': ICAO_list,
-         'Years': getYears(),
-         'M2N': config["MonthToNumber"]})
-
 
 class ASPwalk(object):
     def GET(self):
@@ -306,7 +296,7 @@ class ASPwalk(object):
             date = attr[1].split('_')
             os.symlink(os.path.join(ASP_dir, attr[0], date[0], date[1], f), rand_dirname + f)
 
-        dump = Popen(['standalone_dsp -w -D '+ rand_dirname + ' -c'], shell=True, stdout=PIPE, stderr=PIPE)
+        dump = Popen([ROOT + '/bin/standalone_dsp -w -D '+ rand_dirname + ' -c'], shell=True, stdout=PIPE, stderr=PIPE)
         print '--> retrieving ASP output'
         out = dump.communicate()
         shutil.rmtree(rand_dirname)

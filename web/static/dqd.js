@@ -1,3 +1,4 @@
+DQDWALK = 'dqdwalk?d='
 var now = new Date();
 var then = new Date(now.getTime() - 182.5 * 24 * 3600 * 1e3);
 var month = new Date(now.getTime() - (365/12) * 24 * 3600 * 1e3);
@@ -27,12 +28,15 @@ var weights = [0.25,0.33,0.42], // Weights for Rain, Snow, & Bragg methods, resp
     storeData = {},
     year = now.getFullYear().toString(),
     monthNum = (now.getMonth() + 1).toString(),
-    DQDICAO = "KABR",
+    dqdIcao = "KABR",
     firstLoad = true,
     prevPage = "dqd",
     channel = ["Chan1"],
     MainGage = null, RainGage = null, SnowGage = null, BraggGage = null
 ;
+/**
+ * Checks to see if the user has selected a date in the past
+ */
 
 function dateCheck()
 {
@@ -41,7 +45,9 @@ function dateCheck()
     var yearBool = year == now.getFullYear().toString();
     return monthBool && yearBool
 }
-
+/**
+ * Sets the intervals to partition the data for dates in the past
+ */
 function Interval()
 {
     check = dateCheck()
@@ -62,17 +68,9 @@ function Interval()
     };
     return interval
 }
-
-function mean(arr)
-{
-    var i,
-        sum = 0,
-	len = arr.length;
-    for (i=0; i < len; i++) {
-	sum += arr[i];
-    }
-    return sum / len;
-}
+/**
+ * Utility function for calculating the median of an array
+ */
 
 function median(arr) 
 {
@@ -86,6 +84,12 @@ function median(arr)
     else
         return (arr[half-1] + arr[half]) / 2.0;
 }
+/**
+ * Utility function for calculating the 
+ * weighted mean of an array of dB values
+ * based on the weights set in the 'weights'
+ * array
+ */
 
 function dBMeanWeighted(arr) 
 {
@@ -99,7 +103,9 @@ function dBMeanWeighted(arr)
     var convertedBack = 10 * Math.log10(weightedLinearMean);
     return convertedBack;
 }
-
+/**
+ * Builds HTML for graph tooltip
+ */
 function showTooltip(x, y, contents) {
     $('<div id="tooltip">' + contents + '</div>').css( {
         position: 'absolute',
@@ -112,7 +118,9 @@ function showTooltip(x, y, contents) {
         opacity: 0.80
     }).appendTo("body").fadeIn(200);
 }
-
+/*
+ * Plotting function for 3-panel chart
+ */
 function setSizesFull(plotAdd) {
     var SummaryData = storeData['SummaryData'],
         DailyData = storeData['DailyData'],
@@ -337,7 +345,9 @@ function setSizesFull(plotAdd) {
 
 }
 
-
+/**
+ * Plotting function for single method charts
+ */
 function setSizes(pageName, plotAdd)
 {
     var SummaryData = storeData['SummaryData'],
@@ -548,11 +558,9 @@ function setSizes(pageName, plotAdd)
     
 }
 
-function normalizeToGage(val)
-{
-    return Math.max(0, Math.min(100, Math.round(val / 1.0 * 50 + 50)));
-}
-
+/**
+ * Sets Gauge values
+ */
 function determineOverview(chan,initialData)
 {
     var DailyData = initialData ? initialData['DailyData'] : storeData['DailyData'],
@@ -639,7 +647,9 @@ function determineOverview(chan,initialData)
     else
         BraggGage.refresh(tBragg);
 }
-
+/**
+ * Initializes Gauges
+ */
 function makeGages()
 {
     MainGage = new JustGage({
@@ -697,12 +707,14 @@ function makeGages()
 
 
 }
-
+/**
+ * Requests dqdwalk data from server
+ */
 function loadDQDData() 
 {
-    var load_string = 'dqd/dqdwalk?d=' + monthNum + '-' + year + '-' + DQDICAO
-    $('.sites').html(DQDICAO+' - Shade Chart - Past 6 Months |');
-    $('#site').html(DQDICAO);
+    var load_string = urlPrefix + 'dqdwalk?d=' + monthNum + '-' + year + '-' + dqdIcao
+    $('.sites').html(dqdIcao+' - Shade Chart - Past 6 Months |');
+    $('#site').html(dqdIcao);
     $('#selectMonth').val(numberToMonth[monthNum]).selectmenu('refresh')
     $('#selectYear').val(year).selectmenu('refresh')
     $('.ui-loader').css('display','initial')
@@ -735,9 +747,9 @@ function loadDQDData()
 	$('.redundant').css('visibility',disp_redund);
 	storeData = data;
     })
-    .error(function (jqXHR, textStatus, errorThrown) {	
-	alert('Internal Server Error :(' )
-	$('.ui-loader').css('display','none')
+    .fail(function () { 
+        alert('Loading requested data failed :(' )
+        $('.ui-loader').css('display','none')
     })
     ;
 };
@@ -745,8 +757,8 @@ function loadDQDData()
 
 
 $(document).ready(function () {
-        DQDICAO = $('select[name="dqdICAO"]').val()
-        $('#site').html(DQDICAO);
+        dqdIcao = $('select[name="dqdICAO"]').val()
+        $('#site').html(dqdIcao);
        	$( ":mobile-pagecontainer" ).on( "pagecontainershow", function() {
             var pageValid = $(this)[0].baseURI.split('#')[1] 
 	    var pageName = pageValid == undefined ? "dqd-page":$(this)[0].baseURI.split('#')[1] 
@@ -832,7 +844,7 @@ $(document).ready(function () {
 	});
 
 	$('select[name="dqdICAO"]').on('change', function () {
-	    DQDICAO = $(this).val();
+	    dqdIcao = $(this).val();
 	    loadDQDData();
 	});
 	$('#oneMonth').prop('checked',true).click();

@@ -1,8 +1,10 @@
-var loadPre = "dqd/aspwalk?d=";
-var ICAO = 'KABR';
-var messageStore = {};
-var mimeType = "text/plain";
-var logInfo = "N/A"
+ASPWALK = "aspwalk?d=";
+var aspUri = urlPrefix + ASPWALK,
+    ICAO = 'KABR',
+    messageStore = {},
+    mimeType = "text/plain",
+    logInfo = "N/A"
+;
 
 function loadData(loadString,stripGenInfo) 
 {
@@ -12,7 +14,7 @@ function loadData(loadString,stripGenInfo)
     });
     logInfo = loadString;
     $('.ui-loader').css('display','initial')
-    $.getJSON(loadPre + loadString, function (data) {
+    $.getJSON(aspUri + loadString, function (data) {
 	$('#logBody').html('<tr/>')
 	messageStore = data;
         for (var m = 0 ; m < data.length - 1; m++) {

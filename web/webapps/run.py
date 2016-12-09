@@ -25,5 +25,6 @@ URLS = (
     '/feedback','handlers.Feedback'
 )
 
-application = web.application(URLS, globals()).wsgifunc()
-#application.run()
+application = web.application(URLS, globals())#.wsgifunc()
+if __name__ == "__main__":
+    application.run()

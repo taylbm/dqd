@@ -24,10 +24,14 @@
 ### blocks
 ###
 
-<%block name="extra_header_markup">
-</%block>
 <% page_list = ['rain','snow','bragg']
 %>
+
+<%block name="extra_header_markup">
+<script>
+var urlPrefix = "${Prefix}"
+</script>
+</%block>
 
         <div id="dqd-page" data-role="page">
             <div id="nav-panel" data-role="panel" data-position="right" data-display="overlay">
@@ -70,13 +74,13 @@
             <div data-role="header" style="overflow:hidden;" data-theme="b">
                 <div class="ui-grid-c">
         	    <div class="ui-block-a" style="width:5%">
-            	 	<img style="height:50px" src="dqd/static/ROC_logo.png"></img>
+            	 	<img style="height:50px" src="${Prefix}static/ROC_logo.png"></img>
         	    </div>
                     <div class="ui-block-b" style="width:5%">
-                 	<img style="height:50px" src="dqd/static/NWS_logo.svg"></img>
+                 	<img style="height:50px" src="${Prefix}static/NWS_logo.svg"></img>
             	    </div>
             	    <div class="ui-block-c" style="width:5%">
-            		<img style="height:50px" src="dqd/static/NOAA_logo.svg"></img>
+            		<img style="height:50px" src="${Prefix}static/NOAA_logo.svg"></img>
         	    </div>
         	    <h2 class="ui-block-d" style="text-align:center;width:70%;margin-top:0.5%">Data Quality Dashboard</h2>
         	</div>
@@ -312,8 +316,8 @@
                 <h3>NEXRAD Radar Operations Center - INTERNAL USE ONLY</h3>
             </div>
         </div>
+        <script src="${Prefix}static/dqd.js"></script>
 
-	
-
-<%include file="asp_viewer.html"/>
+<%include file="aspViewer.html"/>
+<script src="${Prefix}static/asp_viewer.js"></script>
 
