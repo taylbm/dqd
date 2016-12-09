@@ -272,7 +272,8 @@ def dqdwalk(rand_dirname):
 
 class IndexView(object):
     def GET(self):
-        url_prefix = web.ctx.env.get("SCRIPT_NAME")
+        script_name = web.ctx.env.get("SCRIPT_NAME")
+        url_prefix = script_name if script_name == '' else script_name + '/' 
         return LOOKUP.Index(**{'ICAO_list': ICAO_list,
          'Years': getYears(),
          'M2N': config["MonthToNumber"],
