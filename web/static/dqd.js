@@ -160,10 +160,11 @@ function setSizesFull(plotAdd) {
         $.each(DailyData, function(idx, obj) {
             var channel = 'Chan' + obj.redundantMode
             $.each(obj, function(name,data) {
-                if (name != "time" && name != "redundantMode")
+                if (name != "time" && name != "redundantMode") {
                     redundantChart[channel]["dailyPoints"][name].push([obj.time * 1e3, data]);
                     redundantChart[channel]["overBounds"][name].push([obj.time * 1e3, data > 0.50 ? 0.50 : null]);
-                    redundantChart[channel]["underBounds"][name].push([obj.time * 1e3, -0.50 > data ? -0.50 : null]);
+                    redundantChart[channel]["underBounds"][name].push([obj.time * 1e3, -0.50 > data ? -0.50 : null]);	
+		}
             });
         });
     }

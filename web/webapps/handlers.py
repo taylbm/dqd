@@ -22,7 +22,7 @@ import smtplib
 
 
 sender = 'dqd@lnxrpg5'
-recipient = 'Brandon.M.Taylor@noaa.gov'
+recipient = 'Lindsey.M.Richardson@noaa.gov'
 
 HERE = os.path.split(os.path.abspath(__file__))[0]
 PARENT = os.path.split(HERE)[0]
